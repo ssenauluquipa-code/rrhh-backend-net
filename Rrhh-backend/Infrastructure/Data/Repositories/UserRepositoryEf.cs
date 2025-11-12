@@ -22,7 +22,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<User?> GetUserByEmail(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && u.IsActive);
+            return await _context.Users.FirstOrDefaultAsync(u =>
+            u.Email.ToLower() == email.ToLower() && u.IsActive);
         }
 
         public User? Authenticate(string email, string password)

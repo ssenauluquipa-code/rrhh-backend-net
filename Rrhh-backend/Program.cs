@@ -75,7 +75,7 @@ builder.Services.AddDbContext<RrhhDbContext>(options =>
 
 
 builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
-builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
