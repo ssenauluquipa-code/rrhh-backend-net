@@ -1,0 +1,19 @@
+# Secrets
+appsettings.Development.json
+appsettings.Production.json
+
+# IDE
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build
+bin/
+obj/
+out/
+
+# Logs
+logs/
+*.log
