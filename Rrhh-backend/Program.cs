@@ -7,6 +7,8 @@ using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Infrastructure.Data;
 using Rrhh_backend.Infrastructure.Data.Repositories;
 using Rrhh_backend.Infrastructure.Services;
+using Rrhh_backend.Security;
+using Rrhh_backend.Shared.Security;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -71,16 +73,21 @@ builder.Services.AddDbContext<RrhhDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+// Jwt Setting
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection(JwtSettings.SectionName)
+    );
+//JWT UTIL
+builder.Services.AddScoped<JwtUtil>();
 // Repositories and Services
-
-
 builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
-//configurar JWT
-var key = Encoding.ASCII.GetBytes("una_clave_secreta_de_al_menos_64_caracteres_para_HS512_correcto_y_seguro_en_NET8");
+//JWT AUTHENTICATION
+var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName);
+var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
 
 builder.Services.AddAuthentication(x =>
 {

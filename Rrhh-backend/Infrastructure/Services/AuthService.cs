@@ -67,8 +67,17 @@ namespace Rrhh_backend.Infrastructure.Services
         public async Task<LoginResponse?> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetUserByEmail(request.Email);
-            if(user != null || user?.Password != request.Password)
+            if (user == null)
             {
+                Console.WriteLine($"❌ Usuario no encontrado con email: {request.Email}");
+                return null;
+            }
+
+            Console.WriteLine($"✅ Usuario encontrado: {user.UserName}, IsActive: {user.IsActive}");
+
+            if (!user.IsActive)
+            {
+                Console.WriteLine($"❌ Usuario inactivo: {user.Email}");
                 return null;
             }
             var token = GenerateTokenJWT(user);
