@@ -80,9 +80,14 @@ builder.Services.Configure<JwtSettings>(
 //JWT UTIL
 builder.Services.AddScoped<JwtUtil>();
 // Repositories and Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+/******* USER *******/
 builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+/*** roles ***/
+builder.Services.AddScoped<IRolesRepository, RolesRepositoryEF>();
+builder.Services.AddScoped<IRolesService,  RolesService>();
+
 //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 //JWT AUTHENTICATION

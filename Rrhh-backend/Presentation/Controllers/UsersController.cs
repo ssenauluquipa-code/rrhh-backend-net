@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rrhh_backend.Core.Interfaces.Services;
-using Rrhh_backend.Presentation.DTOs.Requests;
+using Rrhh_backend.Presentation.DTOs.Requests.Users;
 using Rrhh_backend.Presentation.DTOs.Responses;
 
 namespace Rrhh_backend.Presentation.Controllers
@@ -56,6 +56,14 @@ namespace Rrhh_backend.Presentation.Controllers
             var result = await _userService.DeleteAsync(id);
             if (!result) return NotFound();
             return NoContent();
+        }
+
+        [HttpPut("{id}/activate")]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var result = await _userService.ActicatedAsync(id);
+            if (!result) return NotFound(new { message = " Usuario no encontrado o ya esta activo " });
+            return Ok(new { message = " Usuario reactivado exitosamente " });
         }
     }
 }

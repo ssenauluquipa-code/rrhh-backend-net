@@ -18,7 +18,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<User?> GetUserById(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.IsActive);            
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id 
+            && u.IsActive);            
         }
         public async Task<User?> GetUserByEmail(string email)
         {
@@ -61,7 +62,17 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             return false;
         }
 
-
-
+        public async Task<bool> ActiveAsync(int id)
+        {
+            var users = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if(users != null && !users.IsActive)
+            {
+                users.IsActive = true;
+                users.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Rrhh_backend.Presentation.DTOs.Requests;
+﻿using Rrhh_backend.Presentation.DTOs.Requests.Users;
 using Rrhh_backend.Presentation.DTOs.Responses;
 
 namespace Rrhh_backend.Core.Interfaces.Services
@@ -11,5 +11,6 @@ namespace Rrhh_backend.Core.Interfaces.Services
         Task<UserResponse> CreateAsync(CreateUserRequest request);
         Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request);
         Task<bool> DeleteAsync(int id);
+        Task<bool> ActicatedAsync(int id);
     }
 }

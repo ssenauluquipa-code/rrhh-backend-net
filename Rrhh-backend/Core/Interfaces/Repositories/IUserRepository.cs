@@ -12,6 +12,7 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
         Task<User?> CreateUser(User user);
         Task<User?> UpdateUser(int id, User user);
         Task<bool> DeleteUser(int id);
+        Task<bool> ActiveAsync(int id);
         User? Authenticate(string email, string password);
     }
 }

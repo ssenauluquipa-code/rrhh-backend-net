@@ -1,0 +1,70 @@
+﻿
+🧱 1. Define la entidad (Modelo de dominio)
+Carpeta: Core/Entities/
+Archivo: Employee.cs
+
+✅ Define los campos que tendrá el empleado
+✅ Hereda de BaseEntity (si tienes una clase base con Id, CreatedAt, etc.)
+✅ Incluye relaciones si aplica (Department, Job, etc.)
+
+🧩 2. Crea los DTOs de entrada y salida
+Carpeta: Presentation/DTOs/Requests/
+Archivos:
+
+CreateEmployeeRequest.cs
+UpdateEmployeeRequest.cs
+Carpeta: Presentation/DTOs/Responses/
+Archivo:
+
+EmployeeResponse.cs
+✅ Define cómo se recibe y devuelve la información
+✅ No expongas la entidad directamente
+✅ Incluye solo campos necesarios
+
+🧩 3. Define la interfaz del repositorio
+Carpeta: Core/Interfaces/Repositories/
+Archivo: IEmployeeRepository.cs
+
+✅ Define métodos: GetAll, GetById, Create, Update, Delete
+✅ Usa la entidad Employee
+✅ Devuelve Task<T> para operaciones asincrónicas
+
+🧩 4. Define la interfaz del servicio
+Carpeta: Core/Interfaces/Services/
+Archivo: IEmployeeService.cs
+
+✅ Define métodos de negocio: GetAllAsync, CreateAsync, etc.
+✅ Usa DTOs de entrada y salida
+✅ No uses la entidad aquí
+
+🧩 5. Crea la implementación del repositorio
+Carpeta: Infrastructure/Data/Repositories/
+Archivo: EmployeeRepositoryEf.cs
+
+✅ Implementa IEmployeeRepository
+✅ Usa DbContext para operaciones con base de datos
+✅ Mapea entre entidad y DTO si es necesario
+
+🧩 6. Crea la implementación del servicio
+Carpeta: Infrastructure/Services/
+Archivo: EmployeeService.cs
+
+✅ Implementa IEmployeeService
+✅ Usa el repositorio para operaciones de datos
+✅ Valida reglas de negocio
+✅ Mapea entre DTOs y entidades
+
+🧩 7. Crea el controlador
+Carpeta: Presentation/Controllers/
+Archivo: EmployeesController.cs
+
+✅ Usa IEmployeeService
+✅ Define rutas: GET /api/employees, POST /api/employees, etc.
+✅ Protege rutas con [Authorize] si aplica
+✅ Devuelve DTOs, no entidades
+
+8. Registra el servicio en Program.cs
+csharp
+
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryEf>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();

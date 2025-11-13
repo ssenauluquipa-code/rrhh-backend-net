@@ -1,4 +1,4 @@
-﻿namespace Rrhh_backend.Presentation.DTOs.Requests
+﻿namespace Rrhh_backend.Presentation.DTOs.Requests.Users
 {
     public class CreateUserRequest
     {

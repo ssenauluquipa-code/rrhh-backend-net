@@ -1,7 +1,7 @@
 ﻿using Rrhh_backend.Core.Entities;
 using Rrhh_backend.Core.Interfaces.Repositories;
 using Rrhh_backend.Core.Interfaces.Services;
-using Rrhh_backend.Presentation.DTOs.Requests;
+using Rrhh_backend.Presentation.DTOs.Requests.Users;
 using Rrhh_backend.Presentation.DTOs.Responses;
 
 namespace Rrhh_backend.Infrastructure.Services
@@ -76,6 +76,11 @@ namespace Rrhh_backend.Infrastructure.Services
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt
             };
+        }
+
+        public async Task<bool> ActicatedAsync(int id)
+        {
+            return await _userRepository.ActiveAsync(id);
         }
     }
 }
