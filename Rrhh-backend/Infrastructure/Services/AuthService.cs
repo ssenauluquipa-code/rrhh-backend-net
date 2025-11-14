@@ -85,7 +85,7 @@ namespace Rrhh_backend.Infrastructure.Services
             {
                 Token = token,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
-                Role = user.Role
+                Role = user.RoleId
             };
 
         }
@@ -129,7 +129,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.RoleId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

@@ -37,7 +37,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 UserName = request.Username,
                 Email = request.Email,
                 Password = request.Password, // En el futuro: encriptar
-                Role = request.Role
+                RoleId = request.RoleId
             };
 
             var created = await _userRepository.CreateUser(user);
@@ -52,8 +52,8 @@ namespace Rrhh_backend.Infrastructure.Services
                 user.UserName = request.UserName;
             if (!string.IsNullOrEmpty(request.Email))
                 user.Email = request.Email;
-            if (!string.IsNullOrEmpty(request.Role))
-                user.Role = request.Role;
+            if (request.RoleId.HasValue)
+                user.RoleId = request.RoleId.Value;
 
             user.UpdatedAt = DateTime.UtcNow;
 
@@ -71,7 +71,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
-                Role = user.Role,
+                RoleName = user.Role?.RoleName ?? "Sin Rol",
                 IsActive = user.IsActive,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt

@@ -14,7 +14,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<List<User>> GetUsers()
         {
-            return await _context.Users.Where(u => u.IsActive).ToListAsync();
+            return await _context.Users.Include(u => u.Role)
+                .Where(u => u.IsActive).ToListAsync();
         }
         public async Task<User?> GetUserById(int id)
         {

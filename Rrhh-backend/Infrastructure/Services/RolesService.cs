@@ -30,7 +30,7 @@ namespace Rrhh_backend.Infrastructure.Services
             var roles = new Role
             {
                 RoleName = request.RoleName,
-                Descripcion = request.Description,
+                Description = request.Description,
 
             };
             var created = await _rolesRepository.CreatedRoles(roles);
@@ -44,7 +44,7 @@ namespace Rrhh_backend.Infrastructure.Services
             if (!string.IsNullOrEmpty(request.RoleName))
                 roles.RoleName = request.RoleName;
             if (!string.IsNullOrEmpty(request.Description))
-                roles.Descripcion = request.Description;
+                roles.Description = request.Description;
 
             roles.UpdatedAt = DateTime.UtcNow;
             var update = await _rolesRepository.UpdatedRoles(id, roles);
@@ -65,7 +65,7 @@ namespace Rrhh_backend.Infrastructure.Services
             {
                 Id = roles.Id,
                 RoleName = roles.RoleName,
-                Description = roles.Descripcion,
+                Description = roles.Description,
                 IsActivate = roles.IsActive,
                 CreatedAt = roles.CreatedAt,
                 UpdatedAt = roles.UpdatedAt

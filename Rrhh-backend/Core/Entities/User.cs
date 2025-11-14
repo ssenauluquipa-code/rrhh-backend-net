@@ -16,9 +16,8 @@ namespace Rrhh_backend.Core.Entities
         public string Password { get; set; } = string.Empty;
 
         [MaxLength(50)]
-        public string Role { get; set; }     = string.Empty;    
+        public int RoleId { get; set; }    
         
-        public int RoleId { get; set; }
-        public virtual Role? Roles { get; set; }
+        public virtual Role? Role { get; set; }
     }
 }

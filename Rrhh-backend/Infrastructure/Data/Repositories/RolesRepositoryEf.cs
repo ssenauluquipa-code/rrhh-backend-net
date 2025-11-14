@@ -33,7 +33,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             if(existing != null)
             {
                 existing.RoleName = roles.RoleName;
-                existing.Descripcion = roles.Descripcion;
+                existing.Description = roles.Description;
                 existing.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
