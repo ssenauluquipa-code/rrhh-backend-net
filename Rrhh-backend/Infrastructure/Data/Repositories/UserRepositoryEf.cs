@@ -19,12 +19,14 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<User?> GetUserById(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id 
+            return await _context.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id 
             && u.IsActive);            
         }
         public async Task<User?> GetUserByEmail(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u =>
+            return await _context.Users.Include(u => u.Role)
+                .FirstOrDefaultAsync(u =>
             u.Email.ToLower() == email.ToLower() && u.IsActive);
         }
 
@@ -45,7 +47,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             if (existing != null) {
                 existing.UserName = user.UserName;
                 existing.Email = user.Email;
-                existing.Role = user.Role;
+                existing.RoleId = user.RoleId;
                 existing.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
