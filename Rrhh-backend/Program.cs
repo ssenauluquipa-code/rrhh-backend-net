@@ -91,8 +91,14 @@ builder.Services.AddScoped<IRolesService,  RolesService>();
 //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 //JWT AUTHENTICATION
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName);
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
+//var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName);
+//var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
+var secret = builder.Configuration["JwtSettings:SecretKey"];
+if (string.IsNullOrWhiteSpace(secret))
+{
+    throw new InvalidOperationException("JWT Secret Key is not configured.");
+}
+var key = Encoding.ASCII.GetBytes(secret);
 
 builder.Services.AddAuthentication(x =>
 {
