@@ -88,6 +88,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRolesRepository, RolesRepositoryEF>();
 builder.Services.AddScoped<IRolesService,  RolesService>();
 
+builder.Services.AddScoped<ICompanyRepository, CompanyRepositoryEf>();
+builder.Services.AddScoped<ITenantService, TenantService>();
 //builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 //JWT AUTHENTICATION
