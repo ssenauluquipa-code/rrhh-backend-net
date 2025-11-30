@@ -17,7 +17,7 @@ namespace Rrhh_backend.Infrastructure.Services
             _companyRepo = companyRepo;
             _aivenTemplate = Environment.GetEnvironmentVariable("AIVEN_CONNECTION_TEMPLATE")
                             ?? "Server=mysq.aivencloud.com;Port=12345;Database={0};Uid=user;Pwd=password;";
-            _allowedEmail = "tu@email.com"; // ¡CAMBIA ESTO A TU EMAIL REAL!
+            _allowedEmail = "senauluquipas@gmail.com"; // ¡CAMBIA ESTO A TU EMAIL REAL!
         }
 
         public async Task<TenantResponse> CreateTenantAsync(CreateTenantRequest request)
