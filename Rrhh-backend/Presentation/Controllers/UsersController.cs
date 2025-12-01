@@ -26,7 +26,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserResponse>> GetById(Guid id)
+        public async Task<ActionResult<UserResponse>> GetById(int id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null) return NotFound();
@@ -42,7 +42,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserResponse>> Update(Guid id, [FromBody] UpdateUserRequest request)
+        public async Task<ActionResult<UserResponse>> Update(int id, [FromBody] UpdateUserRequest request)
         {
             var user = await _userService.UpdateAsync(id, request);
             if (user == null) return NotFound();
@@ -50,7 +50,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(int id)
         {
             var result = await _userService.DeleteAsync(id);
             if (!result) return NotFound();
@@ -58,7 +58,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPut("{id}/activate")]
-        public async Task<IActionResult> Activate(Guid id)
+        public async Task<IActionResult> Activate(int id)
         {
             var result = await _userService.ActicatedAsync(id);
             if (!result) return NotFound(new { message = " Usuario no encontrado o ya esta activo " });

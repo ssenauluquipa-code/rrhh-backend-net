@@ -25,7 +25,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EmployeeResponse>> GetById(Guid id)
+        public async Task<ActionResult<EmployeeResponse>> GetById(int id)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<EmployeeResponse>> Update(Guid id, [FromBody] UpdateEmployeeRequest request)
+        public async Task<ActionResult<EmployeeResponse>> Update(int id, [FromBody] UpdateEmployeeRequest request)
         {
             try
             {

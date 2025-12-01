@@ -5,7 +5,7 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
     public interface IEmployeeRepository
     {
         Task<List<Employee>> GetEmployeeAll();
-        Task<Employee> GetEmployeeByIdAsync(Guid id);
+        Task<Employee> GetEmployeeByIdAsync(int id);
         Task<Employee> CreateByAsync(Employee employee);
         Task<Employee> UpdateByAsync(Employee employee);
 

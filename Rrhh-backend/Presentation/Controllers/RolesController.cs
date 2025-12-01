@@ -27,7 +27,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RolesResponse>> GetRolesById(Guid id)
+        public async Task<ActionResult<RolesResponse>> GetRolesById(int id)
         {
             var roles = await _rolesService.GetRolesByIdAsync(id);
             if (roles == null) return NotFound();
@@ -42,7 +42,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<RolesResponse>> UpdateRoles(Guid id, [FromBody] UpdateRolesRequest request)
+        public async Task<ActionResult<RolesResponse>> UpdateRoles(int id, [FromBody] UpdateRolesRequest request)
         {
             var roles = await _rolesService.UpdateRolesAsync(id, request);
             if (roles == null) return NotFound();
@@ -50,7 +50,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult>DeleteRoles(Guid id)
+        public async Task<IActionResult>DeleteRoles(int id)
         {
             var result = await _rolesService.DeletedAsync(id);
             if (!result) return NotFound(new { message = "se cambio d eestado de forma correcta" });
@@ -58,7 +58,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPut("{id}/activate")]
-        public async Task<IActionResult> ActivateRoles(Guid id)
+        public async Task<IActionResult> ActivateRoles(int id)
         {
             var result = await _rolesService.ActivatedAsync(id);
             if (!result) return NotFound(new { message = "no se cmabio ocurrio un error" });

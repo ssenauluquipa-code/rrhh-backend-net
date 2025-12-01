@@ -6,10 +6,10 @@ namespace Rrhh_backend.Core.Interfaces.Services
     public interface IRolesService
     {
         Task<List<RolesResponse>> GetRolesAllAsync();
-        Task<RolesResponse> GetRolesByIdAsync(Guid id);
+        Task<RolesResponse> GetRolesByIdAsync(int id);
         Task<RolesResponse> CreatedRolesAsync(CreateRolesRequest request);
-        Task<RolesResponse> UpdateRolesAsync(Guid id,UpdateRolesRequest request);
-        Task<bool> DeletedAsync(Guid id);
-        Task<bool> ActivatedAsync(Guid id);
+        Task<RolesResponse> UpdateRolesAsync(int id,UpdateRolesRequest request);
+        Task<bool> DeletedAsync(int id);
+        Task<bool> ActivatedAsync(int id);
     }
 }

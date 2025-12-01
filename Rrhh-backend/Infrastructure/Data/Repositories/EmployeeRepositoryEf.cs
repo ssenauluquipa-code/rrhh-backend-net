@@ -17,7 +17,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             return await _context.Employees.Where(e => e.IsActive).ToListAsync();
         }
 
-        public async Task<Employee?> GetEmployeeByIdAsync(Guid id)
+        public async Task<Employee?> GetEmployeeByIdAsync(int id)
         {
             return await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
         }

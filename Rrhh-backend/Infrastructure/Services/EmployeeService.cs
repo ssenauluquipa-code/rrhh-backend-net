@@ -60,7 +60,7 @@ namespace Rrhh_backend.Infrastructure.Services
             }).ToList();
         }
 
-        public async Task<EmployeeResponse> GetByIdAsync(Guid id)
+        public async Task<EmployeeResponse> GetByIdAsync(int id)
         {
             var employee = await _employeeRepository.GetEmployeeByIdAsync(id);
             return new EmployeeResponse
@@ -77,7 +77,7 @@ namespace Rrhh_backend.Infrastructure.Services
             };
         }
 
-        public async Task<EmployeeResponse> UpdateAsync(Guid id, UpdateEmployeeRequest request)
+        public async Task<EmployeeResponse> UpdateAsync(int id, UpdateEmployeeRequest request)
         {
             var employee = await _employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)

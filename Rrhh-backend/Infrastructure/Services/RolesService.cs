@@ -21,7 +21,7 @@ namespace Rrhh_backend.Infrastructure.Services
             var roles = await _rolesRepository.GetRolesAllAsync();
             return roles.Select(MapToResponse).ToList();
         }
-        public async Task<RolesResponse?> GetRolesByIdAsync(Guid id)
+        public async Task<RolesResponse?> GetRolesByIdAsync(int id)
         {
             var roles = await _rolesRepository.GetRolesByIdAsync(id);
             //return roles != null ? MapToResponse(roles) : null;
@@ -55,7 +55,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 IsActivate = role.IsActive
             };
         }
-        public async Task<RolesResponse?> UpdateRolesAsync(Guid id ,UpdateRolesRequest request)
+        public async Task<RolesResponse?> UpdateRolesAsync(int id ,UpdateRolesRequest request)
         {
             //var roles = await _rolesRepository.GetRolesByIdAsync(id);
             var role = await _rolesRepository.GetRolesByIdAsync(id);
@@ -84,11 +84,11 @@ namespace Rrhh_backend.Infrastructure.Services
                 IsActivate = role.IsActive
             };
         }
-        public async Task<bool> DeletedAsync(Guid id)
+        public async Task<bool> DeletedAsync(int id)
         {
             return await _rolesRepository.Deleted(id);
         }
-        public async Task<bool> ActivatedAsync(Guid id)
+        public async Task<bool> ActivatedAsync(int id)
         {
             return await _rolesRepository.IsActivateRoles(id);
         }

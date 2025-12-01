@@ -18,7 +18,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             return await _context.Permissions.Where(p => p.IsActive).ToListAsync();
         }
 
-        public async Task<Permission?> GetByIdAsync(Guid id)
+        public async Task<Permission?> GetByIdAsync(int id)
         {
             return await _context.Permissions.FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -35,7 +35,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Permission> DeleteAsync(Guid id)
+        public Task<Permission> DeleteAsync(int id)
         {
             throw new NotImplementedException();
         }

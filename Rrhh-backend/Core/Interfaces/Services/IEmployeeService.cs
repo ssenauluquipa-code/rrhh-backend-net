@@ -6,8 +6,8 @@ namespace Rrhh_backend.Core.Interfaces.Services
     public interface IEmployeeService
     {
         Task<EmployeeResponse> CreateAsync(CreateEmployeeRequest request);
-        Task<EmployeeResponse> GetByIdAsync(Guid id);
-        Task<EmployeeResponse> UpdateAsync(Guid id, UpdateEmployeeRequest request);
+        Task<EmployeeResponse> GetByIdAsync(int id);
+        Task<EmployeeResponse> UpdateAsync(int id, UpdateEmployeeRequest request);
         Task<List<EmployeeResponse>> GetAllAsync();
     }
 }

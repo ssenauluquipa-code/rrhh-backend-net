@@ -7,13 +7,13 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
         //IEnumerable<UserDto> getAllUsers();
         //UserDto? GetById(long id);
         Task<List<User>> GetUsers();
-        Task<User?> GetUserByIdAsync(Guid id);
+        Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<User?> CreateUserAsync(User user);
         Task<User?> UpdateUser(User user);
-        Task<bool> DeleteUser(Guid id);
+        Task<bool> DeleteUser(int id);
 
-        Task<bool> ActiveAsync(Guid id);
+        Task<bool> ActiveAsync(int id);
         User? Authenticate(string email, string password);
     }
 }

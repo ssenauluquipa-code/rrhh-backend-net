@@ -125,28 +125,14 @@ if (builder.Environment.IsDevelopment())
 // Entity Framework Core (MySQL con Pomelo)
 // 4. Obtener cadena de conexión desde variables de entorno o appsettings
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    // Opcional: lanzar error si no está configurada
-    // throw new InvalidOperationException("La cadena de conexión 'DefaultConnection' no está configurada.");
-    // Para desarrollo local, puedes tener un fallback aquí, pero en producción no debería existir.
-    // Es mejor que falle si no está definida en variables de entorno.
-    Console.WriteLine("Advertencia: ConnectionString 'DefaultConnection' no encontrada. Asegúrate de que esté definida como variable de entorno en Render.");
-}
-if (!string.IsNullOrEmpty(connectionString)) // Solo si está definida
-{
-    builder.Services.AddDbContext<NebulaDbContext>(options =>
-    {
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+builder.Services.AddDbContext<NebulaDbContext>(options =>
+ {
+        // Usar una versión específica de MySQL (la de Aiven es 8.0.35)
+        var serverVersion = ServerVersion.Parse("8.0.35-mysql");
+        options.UseMySql(connectionString, serverVersion);
         // No llames a EnsureCreated ni migraciones automáticas aquí si no es intencional
-    });
-}
-else
-{
-    // Opcional: agregar DbContext con cadena vacía o SQLite en memoria para tests locales
-    // builder.Services.AddDbContext<NebulaDbContext>(options => options.UseInMemoryDatabase("test"));
-    Console.WriteLine("No se pudo configurar el DbContext porque la cadena de conexión es nula o vacía.");
-}
+ });
+
 //builder.Services.AddDbContext<NebulaDbContext>(options =>
 //{
 //    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -180,17 +166,7 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepositoryEf>();
 var secret = builder.Configuration["Jwt:Secret"];
 if (string.IsNullOrWhiteSpace(secret))
 {    
-    // Importante: en producción, esto debería impedir el inicio del servidor
-    // Para desarrollo local, puedes tener un fallback, pero en Render NO.
-    if (builder.Environment.IsProduction())
-    {
         throw new InvalidOperationException("JWT Secret Key no está configurado en variables de entorno (Jwt__Secret).");
-    }
-    else
-    {
-        Console.WriteLine("Advertencia: JWT Secret no encontrado. Usa una clave segura en producción.");
-        secret = "fallback-secret-key-for-development-only-do-not-use-in-production-and-is-long-enough-to-be-valid"; // Solo para desarrollo local
-    }
 }
 var key = Encoding.ASCII.GetBytes(secret);
 

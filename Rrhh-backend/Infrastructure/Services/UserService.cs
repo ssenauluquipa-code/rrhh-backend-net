@@ -39,7 +39,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 IsActive = u.IsActive
             }).ToList();
         }
-        public async Task<UserResponse?> GetByIdAsync(Guid id)
+        public async Task<UserResponse?> GetByIdAsync(int id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
             return user != null ? MapToResponse(user) : null;
@@ -95,7 +95,7 @@ namespace Rrhh_backend.Infrastructure.Services
             };
 
         }
-        public async Task<UserResponse?> UpdateAsync(Guid id, UpdateUserRequest request)
+        public async Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
             if (user == null) throw new BusinessException("Usuario no encontrado.");
@@ -125,7 +125,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 IsActive = user.IsActive
             };
         }
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(int id)
         {
             return await _userRepository.DeleteUser(id);
         }
@@ -143,7 +143,7 @@ namespace Rrhh_backend.Infrastructure.Services
             };
         }
 
-        public async Task<bool> ActicatedAsync(Guid id)
+        public async Task<bool> ActicatedAsync(int id)
         {
             return await _userRepository.ActiveAsync(id);
         }

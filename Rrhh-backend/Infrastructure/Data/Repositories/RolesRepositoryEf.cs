@@ -17,7 +17,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         {
             return await _context.Roles.Where(r => r.IsActive).ToListAsync();
         }
-        public async Task<Role?> GetRolesByIdAsync(Guid id)
+        public async Task<Role?> GetRolesByIdAsync(int id)
         {
             return await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
         }
@@ -33,7 +33,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
             return roles;
         }
-        public async Task<bool> Deleted(Guid id)
+        public async Task<bool> Deleted(int id)
         {
             var deleted = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
             if(deleted != null)
@@ -44,7 +44,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             }
             return false;
         }
-        public async Task<bool> IsActivateRoles(Guid id)
+        public async Task<bool> IsActivateRoles(int id)
         {
             var activated = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
             if(activated != null && !activated.IsActive)

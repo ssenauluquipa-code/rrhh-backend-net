@@ -6,11 +6,11 @@ namespace Rrhh_backend.Core.Interfaces.Services
     public interface IUserService
     {
         Task<List<UserResponse>> GetAllAsync();
-        Task<UserResponse?> GetByIdAsync(Guid id);
+        Task<UserResponse?> GetByIdAsync(int id);
         Task<UserResponse?> GetByEmailAsync(string email);
         Task<UserResponse> CreateAsync(CreateUserRequest request);
-        Task<UserResponse?> UpdateAsync(Guid id, UpdateUserRequest request);
-        Task<bool> DeleteAsync(Guid id);
-        Task<bool> ActicatedAsync(Guid id);
+        Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> ActicatedAsync(int id);
     }
 }

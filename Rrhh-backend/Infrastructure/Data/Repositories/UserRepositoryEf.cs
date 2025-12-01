@@ -17,7 +17,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             return await _context.Users.Include(u => u.Role)
                 .Where(u => u.IsActive).ToListAsync();
         }
-        public async Task<User?> GetUserByIdAsync(Guid id)
+        public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _context.Users.Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == id 
@@ -50,7 +50,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
             return user;
         }
-        public async Task<bool> DeleteUser(Guid id)
+        public async Task<bool> DeleteUser(int id)
         {
             var deleted = await _context.Users.FirstOrDefaultAsync(u => u.Id == id && u.IsActive);
             if(deleted != null)
@@ -61,7 +61,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             }
             return false;
         }
-        public async Task<bool> ActiveAsync(Guid id)
+        public async Task<bool> ActiveAsync(int id)
         {
             var users = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
             if(users != null && !users.IsActive)
