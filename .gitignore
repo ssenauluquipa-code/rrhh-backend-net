@@ -1,6 +1,6 @@
 # Secrets
 appsettings.Development.json
-appsettings.Production.json
+appsettings.Production.json  # ← Aunque no lo uses, está bien tenerlo aquí por si acaso
 
 # IDE
 .vs/

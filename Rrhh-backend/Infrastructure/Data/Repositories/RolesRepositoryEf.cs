@@ -6,18 +6,18 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 {
     public class RolesRepositoryEF : IRolesRepository
     {
-        private readonly RrhhDbContext _context;
+        private readonly NebulaDbContext _context;
 
-        public RolesRepositoryEF(RrhhDbContext context)
+        public RolesRepositoryEF(NebulaDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Role>> GetRolesAll()
+        public async Task<List<Role>> GetRolesAllAsync()
         {
             return await _context.Roles.Where(r => r.IsActive).ToListAsync();
         }
-        public async Task<Role?> GetRolesById(int id)
+        public async Task<Role?> GetRolesByIdAsync(Guid id)
         {
             return await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
         }
@@ -27,19 +27,13 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
             return roles;
         }
-        public async Task<Role?> UpdatedRoles(int id, Role roles)
+        public async Task<Role?> UpdatedRoles(Role roles)
         {
-            var existing = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
-            if(existing != null)
-            {
-                existing.RoleName = roles.RoleName;
-                existing.Description = roles.Description;
-                existing.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-            }
-            return existing;
+            _context.Roles.Update(roles);
+            await _context.SaveChangesAsync();
+            return roles;
         }
-        public async Task<bool> Deleted(int id)
+        public async Task<bool> Deleted(Guid id)
         {
             var deleted = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
             if(deleted != null)
@@ -50,7 +44,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             }
             return false;
         }
-        public async Task<bool> IsActivateRoles(int id)
+        public async Task<bool> IsActivateRoles(Guid id)
         {
             var activated = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
             if(activated != null && !activated.IsActive)
@@ -60,6 +54,11 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                 return false;
             }
             return true;
+        }
+
+        public async Task<Role?> GetByNameAsync(string name)
+        {
+            return await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == name);
         }
     }
 }

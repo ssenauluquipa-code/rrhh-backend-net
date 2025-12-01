@@ -1,10 +1,13 @@
 ﻿
 using Microsoft.IdentityModel.Tokens;
 using Rrhh_backend.Core.Entities;
+using Rrhh_backend.Core.Exceptions;
 using Rrhh_backend.Core.Interfaces.Repositories;
 using Rrhh_backend.Core.Interfaces.Services;
-using Rrhh_backend.Presentation.DTOs.Requests;
-using Rrhh_backend.Presentation.DTOs.Responses;
+using Rrhh_backend.Presentation.DTOs.Requests.Auth;
+using Rrhh_backend.Presentation.DTOs.Responses.Auth;
+using Rrhh_backend.Security;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -63,37 +66,56 @@ namespace Rrhh_backend.Infrastructure.Services
         //        throw;
         //    }
         //}
-        
-        public async Task<LoginResponse?> LoginAsync(LoginRequest request)
+
+        //public async Task<LoginResponse?> LoginAsync(LoginRequest request)
+        //{
+        //    var user = await _userRepository.GetUserByEmailAsync(request.Email);
+        //    if (user == null)
+        //    {
+        //        Console.WriteLine($"❌ Usuario no encontrado con email: {request.Email}");
+        //        return null;
+        //    }
+
+        //    Console.WriteLine($"✅ Usuario encontrado: {user.UserName}, IsActive: {user.IsActive}");
+
+        //    if (!user.IsActive)
+        //    {
+        //        Console.WriteLine($"❌ Usuario inactivo: {user.Email}");
+        //        return null;
+        //    }
+        //    var token = GenerateTokenJWT(user);
+        //    return new LoginResponse
+        //    {
+        //        Token = token,
+        //        ExpiresAt = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
+        //        //Role = user.Role
+        //    };
+
+        //}
+
+        public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
-            var user = await _userRepository.GetUserByEmail(request.Email);
-            if (user == null)
-            {
-                Console.WriteLine($"❌ Usuario no encontrado con email: {request.Email}");
-                return null;
-            }
+            var user = await _userRepository.GetUserByEmailAsync(request.Email);
+            if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
+                throw new BusinessException("Credenciales inválidas.");
 
-            Console.WriteLine($"✅ Usuario encontrado: {user.UserName}, IsActive: {user.IsActive}");
-
-            if (!user.IsActive)
-            {
-                Console.WriteLine($"❌ Usuario inactivo: {user.Email}");
-                return null;
-            }
             var token = GenerateTokenJWT(user);
-            return new LoginResponse
+            return new AuthResponse
             {
                 Token = token,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
-                Role = user.RoleId
+                UserId = user.Id,
+                Name = user.UserName,
+                Email = user.Email,
+                Role = user.Role.RoleName
             };
-
         }
 
         public async Task<bool> LogoutAsync(string token)
         {
             return await Task.FromResult(false);
         }
+
+      
 
         public bool ValidateToken(string token)
         {
@@ -129,7 +151,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                    new Claim(ClaimTypes.Role, user.Role.RoleName)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -138,5 +160,7 @@ namespace Rrhh_backend.Infrastructure.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+            
     }
 }

@@ -1,66 +1,131 @@
 ﻿using Rrhh_backend.Core.Entities;
+using Rrhh_backend.Core.Exceptions;
 using Rrhh_backend.Core.Interfaces.Repositories;
 using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Presentation.DTOs.Requests.Users;
-using Rrhh_backend.Presentation.DTOs.Responses;
+using Rrhh_backend.Presentation.DTOs.Responses.Users;
+using Rrhh_backend.Security;
 
 namespace Rrhh_backend.Infrastructure.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IRolesRepository _rolesRepository;
 
-        public UserService(IUserRepository userRepository)
-        {
+        public UserService(IUserRepository userRepository, 
+                           IEmployeeRepository employeeRepository, 
+                           IRolesRepository rolesRepository){
             _userRepository = userRepository;
+            _employeeRepository = employeeRepository;
+            _rolesRepository = rolesRepository;
         }
 
         public async Task<List<UserResponse>> GetAllAsync()
         {
+            //var users = await _userRepository.GetUsers();
+            //return users.Select(MapToResponse).ToList();
             var users = await _userRepository.GetUsers();
-            return users.Select(MapToResponse).ToList();
+            return users.Select(u => new UserResponse
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                RoleId = u.RoleId,
+                RoleName = u.Role.RoleName,
+                EmployeeId = u.EmployeeId,
+                EmployeeName = u.Employee != null ? $"{u.Employee.FirstName} {u.Employee.LastName}" : null,
+                IsActive = u.IsActive
+            }).ToList();
         }
-        public async Task<UserResponse?> GetByIdAsync(int id)
+        public async Task<UserResponse?> GetByIdAsync(Guid id)
         {
-            var user = await _userRepository.GetUserById(id);
+            var user = await _userRepository.GetUserByIdAsync(id);
             return user != null ? MapToResponse(user) : null;
         }
         public async Task<UserResponse?> GetByEmailAsync(string email)
         {
-            var user = await _userRepository.GetUserByEmail(email);
+            var user = await _userRepository.GetUserByEmailAsync(email);
             return user != null ? MapToResponse(user) : null;
         }
         public async Task<UserResponse> CreateAsync(CreateUserRequest request)
         {
+            var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
+            if(existingUser != null)
+            {
+                throw new BusinessException("El Email ya esta registrado");
+            }
+
+            var role = await _rolesRepository.GetRolesByIdAsync(request.RoleId);
+            if (role ==null){
+                throw new BusinessException("Rol no encontrado.");
+            }
+
+            Employee? employee = null;
+            if (request.EmployeeId.HasValue)
+            {
+                employee = await _employeeRepository.GetEmployeeByIdAsync(request.EmployeeId.Value);
+                if (employee == null)
+                    throw new BusinessException("Empleado no encontrado.");
+            }
             var user = new User
             {
-                UserName = request.Username,
+                UserName = request.UserName,
                 Email = request.Email,
-                Password = request.Password, // En el futuro: encriptar
-                RoleId = request.RoleId
+                PasswordHash = PasswordHasher.HashPassword(request.Password),
+                RoleId = request.RoleId,
+                Role = role,
+                EmployeeId = request.EmployeeId,
+                Employee = employee
             };
 
-            var created = await _userRepository.CreateUser(user);
-            return MapToResponse(created);
+            await _userRepository.CreateUserAsync(user);
+
+            return new UserResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                RoleName = user.Role.RoleName,
+                EmployeeId = user.EmployeeId,
+                EmployeeName = employee != null ? $"{employee.FirstName} {employee.LastName}" : null,
+                IsActive = user.IsActive
+            };
+
         }
-        public async Task<UserResponse?> UpdateAsync(int id, UpdateUserRequest request)
+        public async Task<UserResponse?> UpdateAsync(Guid id, UpdateUserRequest request)
         {
-            var user = await _userRepository.GetUserById(id);
-            if (user == null) return null;
+            var user = await _userRepository.GetUserByIdAsync(id);
+            if (user == null) throw new BusinessException("Usuario no encontrado.");
 
-            if (!string.IsNullOrEmpty(request.UserName))
-                user.UserName = request.UserName;
-            if (!string.IsNullOrEmpty(request.Email))
-                user.Email = request.Email;
-            if (request.RoleId.HasValue)
-                user.RoleId = request.RoleId.Value;
+            user.UserName = request.UserName;
+            user.Email = request.Email;
+            user.RoleId = request.RoleId;
+            user.EmployeeId = request.EmployeeId;
+            user.IsActive = request.IsActive;
 
-            user.UpdatedAt = DateTime.UtcNow;
+            if (!string.IsNullOrEmpty(request.Password))
+                user.PasswordHash = PasswordHasher.HashPassword(request.Password);
 
-            var updated = await _userRepository.UpdateUser(id, user);
-            return updated != null ? MapToResponse(updated) : null;
+            await _userRepository.UpdateUser(user);
+
+            //var updated = await _userRepository.UpdateUser(user);
+            //return updated != null ? MapToResponse(updated) : null;
+            return new UserResponse
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                RoleName = user.Role.RoleName,
+                EmployeeId = user.EmployeeId,
+                EmployeeName = user.Employee != null ? $"{user.Employee.FirstName} {user.Employee.LastName}" : null,
+                IsActive = user.IsActive
+            };
         }
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             return await _userRepository.DeleteUser(id);
         }
@@ -69,7 +134,7 @@ namespace Rrhh_backend.Infrastructure.Services
             return new UserResponse
             {
                 Id = user.Id,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Email = user.Email,
                 RoleName = user.Role?.RoleName ?? "Sin Rol",
                 IsActive = user.IsActive,
@@ -78,7 +143,7 @@ namespace Rrhh_backend.Infrastructure.Services
             };
         }
 
-        public async Task<bool> ActicatedAsync(int id)
+        public async Task<bool> ActicatedAsync(Guid id)
         {
             return await _userRepository.ActiveAsync(id);
         }

@@ -1,10 +1,13 @@
-﻿namespace Rrhh_backend.Presentation.DTOs.Requests.Users
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Rrhh_backend.Presentation.DTOs.Requests.Users
 {
     public class CreateUserRequest
     {
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public int RoleId { get; set; } // ADMIN, HR, EMPLOYEE
+        [Required] public string UserName { get; set; } = string.Empty;
+        [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+        [Required, MinLength(6)] public string Password { get; set; } = string.Empty;
+        [Required] public Guid RoleId { get; set; }
+        public Guid? EmployeeId { get; set; }
     }
 }

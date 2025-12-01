@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Rrhh_backend.Core.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Rrhh_backend.Core.Exceptions;
 using Rrhh_backend.Core.Interfaces.Services;
-using Rrhh_backend.Presentation.DTOs.Requests;
-using Rrhh_backend.Presentation.DTOs.Responses;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Rrhh_backend.Presentation.DTOs.Requests.Auth;
+using Rrhh_backend.Presentation.DTOs.Responses.Auth;
 
 namespace Rrhh_backend.Presentation.Controllers
 {
@@ -22,15 +17,23 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
         {
-            var result = await _authService.LoginAsync(request);
-
-            if (result == null)
+            try
             {
-                return Unauthorized(new { message = "Credenciales inválidas." });
+                var result = await _authService.LoginAsync(request);
+
+                if (result == null)
+                {
+                    return Unauthorized(new { message = "Credenciales inválidas." });
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            catch(BusinessException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            
         }
 
         [HttpPost("logout")]
@@ -46,6 +49,6 @@ namespace Rrhh_backend.Presentation.Controllers
             {
                 return BadRequest(new { message = " No se pudo cerrar session" });
             }
-        }      
+        }        
     }
 }

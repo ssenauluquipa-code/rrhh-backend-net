@@ -4,11 +4,12 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
 {
     public interface IRolesRepository
     {
-        Task<List<Role>> GetRolesAll();
-        Task<Role> GetRolesById(int id);
+        Task<List<Role>> GetRolesAllAsync();
+        Task<Role> GetRolesByIdAsync(Guid id);
+        Task<Role> GetByNameAsync(string name);
         Task<Role> CreatedRoles(Role roles);
-        Task<Role> UpdatedRoles(int id, Role roles);
-        Task<bool> Deleted(int id);
-        Task<bool> IsActivateRoles(int id);
+        Task<Role> UpdatedRoles(Role roles);
+        Task<bool> Deleted(Guid id);
+        Task<bool> IsActivateRoles(Guid id);
     }
 }

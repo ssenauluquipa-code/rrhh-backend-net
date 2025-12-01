@@ -2,6 +2,7 @@
 {
     public class Module : BaseEntity
     {
+        public int ModuleId { get; set; }
         public string ModuleName { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         //public bool IsActive { get; set; }

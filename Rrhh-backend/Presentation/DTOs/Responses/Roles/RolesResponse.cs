@@ -1,8 +1,8 @@
-﻿namespace Rrhh_backend.Presentation.DTOs.Responses
+﻿namespace Rrhh_backend.Presentation.DTOs.Responses.Roles
 {
     public class RolesResponse
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string RoleName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public bool IsActivate { get; set; }
