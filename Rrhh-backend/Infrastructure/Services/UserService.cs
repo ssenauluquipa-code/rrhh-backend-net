@@ -13,6 +13,7 @@ namespace Rrhh_backend.Infrastructure.Services
         private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IRolesRepository _rolesRepository;
+        private readonly PasswordHasher _passwordHasher;
 
         public UserService(IUserRepository userRepository, 
                            IEmployeeRepository employeeRepository, 
@@ -20,6 +21,7 @@ namespace Rrhh_backend.Infrastructure.Services
             _userRepository = userRepository;
             _employeeRepository = employeeRepository;
             _rolesRepository = rolesRepository;
+            _passwordHasher = new PasswordHasher();
         }
 
         public async Task<List<UserResponse>> GetAllAsync()
@@ -73,7 +75,7 @@ namespace Rrhh_backend.Infrastructure.Services
             {
                 UserName = request.UserName,
                 Email = request.Email,
-                PasswordHash = PasswordHasher.HashPassword(request.Password),
+                PasswordHash = _passwordHasher.HashPassword(request.Password),
                 RoleId = request.RoleId,
                 Role = role,
                 EmployeeId = request.EmployeeId,
@@ -107,7 +109,7 @@ namespace Rrhh_backend.Infrastructure.Services
             user.IsActive = request.IsActive;
 
             if (!string.IsNullOrEmpty(request.Password))
-                user.PasswordHash = PasswordHasher.HashPassword(request.Password);
+                user.PasswordHash = _passwordHasher.HashPassword(request.Password);
 
             await _userRepository.UpdateUser(user);
 

@@ -3,12 +3,12 @@ namespace Rrhh_backend.Security
 {
     public class PasswordHasher
     {
-        public static string HashPassword(string password)
+        public  string HashPassword(string password)
         {
             return BC.HashPassword(password);
         }
 
-        public static bool VerifyPassword(string password, string hash)
+        public  bool VerifyPassword(string password, string hash)
         {
             return BC.Verify(password, hash);
         }

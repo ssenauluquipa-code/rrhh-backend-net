@@ -18,11 +18,13 @@ namespace Rrhh_backend.Infrastructure.Services
     {
         private readonly IConfiguration _config;
         private readonly IUserRepository _userRepository;
+        private readonly PasswordHasher _passwordHasher;
 
         public AuthService(IConfiguration config, IUserRepository userRepository)
         {
             _config = config;
             _userRepository = userRepository;
+            _passwordHasher = new PasswordHasher();
         }
 
         //public async Task<LoginResponse?> Login(LoginRequest reques)
@@ -96,7 +98,8 @@ namespace Rrhh_backend.Infrastructure.Services
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetUserByEmailAsync(request.Email);
-            if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
+            var isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
+            if (isValidPassword)
                 throw new BusinessException("Credenciales inválidas.");
 
             var token = GenerateTokenJWT(user);
@@ -144,7 +147,7 @@ namespace Rrhh_backend.Infrastructure.Services
 
         private string GenerateTokenJWT(User user)
         {
-            var key = Encoding.ASCII.GetBytes(_config["JwtSettings:SecretKey"]);
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -153,7 +156,8 @@ namespace Rrhh_backend.Infrastructure.Services
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role.RoleName)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
+                //Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
+                Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -23,14 +23,15 @@ namespace Rrhh_backend.Presentation.Controllers
             {
                 var result = await _authService.LoginAsync(request);
 
-                if (result == null)
-                {
-                    return Unauthorized(new { message = "Credenciales inválidas." });
-                }
+                //if (result == null)
+                //{
+                //    return Unauthorized(new { message = "Credenciales inválidas." });
+                //}
                 return Ok(result);
             }
             catch(BusinessException ex)
             {
+                Console.WriteLine($"Error en login: {ex.Message}");
                 return BadRequest(new { message = ex.Message });
             }
             
