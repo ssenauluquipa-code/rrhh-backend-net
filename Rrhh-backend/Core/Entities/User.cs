@@ -10,6 +10,7 @@ namespace Rrhh_backend.Core.Entities
         public string PasswordHash { get; set; } = string.Empty;        
         public int RoleId { get; set; }
         public int? EmployeeId { get; set; }
+        public string? EmployeeName { get; set; }
         public string RoleName { get; set; } = string.Empty;
 
         // Navigation
