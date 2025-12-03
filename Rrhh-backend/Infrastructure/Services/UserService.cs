@@ -37,7 +37,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 RoleId = u.RoleId,
                 RoleName = u.Role.RoleName,
                 EmployeeId = u.EmployeeId,
-                EmployeeName = u.Employee != null ? $"{u.Employee.FirstName} {u.Employee.LastName}" : null,
+                EmployeeName = u.EmployeeName,
                 IsActive = u.IsActive
             }).ToList();
         }
