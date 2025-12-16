@@ -13,6 +13,7 @@ using Rrhh_backend.Shared.Security;
 using System.Text;
 using System.Text.Json.Serialization;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuración de controladores con serialización camelCase
