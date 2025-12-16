@@ -9,6 +9,7 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
         Task<List<User>> GetUsers();
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
+        Task<User?> GetUserByEmailWithRoleAsync(string email); // ← Nuevo método
         Task<User?> CreateUserAsync(User user);
         Task<User?> UpdateUser(User user);
         Task<bool> DeleteUser(int id);

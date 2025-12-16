@@ -78,6 +78,9 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-       
+        public async Task<User?> GetUserByEmailWithRoleAsync(string email)
+        {
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
+        }
     }
 }

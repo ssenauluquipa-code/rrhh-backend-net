@@ -103,12 +103,6 @@ namespace Rrhh_backend.Infrastructure.Services
                 throw new BusinessException("Credenciales inválidas.");
             }
 
-            // 2. Validar que el usuario esté activo
-            if (!user.IsActive)
-            {
-                throw new BusinessException("Usuario inactivo.");
-            }
-
             // 3. Validar la contraseña
             var isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
             if (!isValidPassword) // ❗ ¡Ahora es NOT!
