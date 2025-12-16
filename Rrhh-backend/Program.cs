@@ -144,7 +144,7 @@ builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("Jwt") // Asegúrate que coincida con la variable Jwt__Secret en Render
     );
 // JWT Util (si lo usas)
-builder.Services.AddScoped<JwtUtil>();
+//builder.Services.AddScoped<JwtUtil>();
 
 // Repositories and Services Auth
 builder.Services.AddScoped<IAuthService, AuthService>();

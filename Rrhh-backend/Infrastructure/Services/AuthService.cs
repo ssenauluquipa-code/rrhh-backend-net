@@ -130,7 +130,7 @@ namespace Rrhh_backend.Infrastructure.Services
 
         public bool ValidateToken(string token)
         {
-            var key = Encoding.ASCII.GetBytes(_config["JwtSettings:SecretKey"]);
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Secret"]);
             var tokenHandler = new JwtSecurityTokenHandler();
 
             try
