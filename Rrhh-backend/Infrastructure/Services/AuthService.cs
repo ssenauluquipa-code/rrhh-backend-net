@@ -98,14 +98,22 @@ namespace Rrhh_backend.Infrastructure.Services
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetUserByEmailAsync(request.Email);
-            if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+            if (user == null)
             {
                 throw new BusinessException("Credenciales inválidas.");
             }
 
+            // 2. Validar que el usuario esté activo
             if (!user.IsActive)
             {
                 throw new BusinessException("Usuario inactivo.");
+            }
+
+            // 3. Validar la contraseña
+            var isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
+            if (!isValidPassword) // ❗ ¡Ahora es NOT!
+            {
+                throw new BusinessException("Credenciales inválidas.");
             }
 
             var token = GenerateTokenJWT(user);
