@@ -98,9 +98,15 @@ namespace Rrhh_backend.Infrastructure.Services
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
             var user = await _userRepository.GetUserByEmailAsync(request.Email);
-            var isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
-            if (isValidPassword)
+            if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+            {
                 throw new BusinessException("Credenciales inválidas.");
+            }
+
+            if (!user.IsActive)
+            {
+                throw new BusinessException("Usuario inactivo.");
+            }
 
             var token = GenerateTokenJWT(user);
             return new AuthResponse
@@ -154,7 +160,8 @@ namespace Rrhh_backend.Infrastructure.Services
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role.RoleName)
+                    new Claim(ClaimTypes.Role, user.Role.RoleName),
+                    new Claim("Id", user.RoleId.ToString())
                 }),
                 //Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
                 Expires = DateTime.UtcNow.AddHours(1),

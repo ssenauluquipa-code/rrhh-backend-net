@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Rrhh_backend.Core.Entities;
 using Rrhh_backend.Core.Exceptions;
 using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Presentation.DTOs.Requests.Auth;
@@ -11,9 +13,11 @@ namespace Rrhh_backend.Presentation.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly IPermissionService _permissionService;
+        public AuthController(IAuthService authService, IPermissionService permissionService)
         {
             _authService = authService;
+            _permissionService = permissionService;
         }
 
         [HttpPost("login")]
@@ -50,6 +54,32 @@ namespace Rrhh_backend.Presentation.Controllers
             {
                 return BadRequest(new { message = " No se pudo cerrar session" });
             }
-        }        
+        }
+
+        [HttpGet("permissions")]
+        [Authorize]
+        public async Task<IActionResult> GetUserPermissions()
+        {
+            try
+            {
+                // Asumiendo que obtienes el roleId del usuario actual
+                var roleId = GetRoleIdFromClaims(); // Implementa esta lógica
+                var permissions = await _permissionService.GetUserPermissionsAsync(roleId);
+                return Ok(new { success = true, data = permissions });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Error al cargar permisos" });
+            }
+        }
+        private int GetRoleIdFromClaims()
+        {
+            var roleIdClaim = User.FindFirst("Id");
+            if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int Id))
+            {
+                throw new NotImplementedException("Implementar obtención de roleId");
+            }
+            return Id;
+        }
     }
 }

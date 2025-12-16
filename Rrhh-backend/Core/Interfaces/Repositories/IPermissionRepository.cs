@@ -9,5 +9,8 @@ namespace Rrhh_backend.Core.Interfaces.Repositories
         Task<Permission> CreateAsync(Permission permission);
         Task<Permission> UpdateAsync(Permission permission);
         Task<Permission> DeleteAsync(int id);
+
+
+        Task<List<Permission>> GetActiveByRoleIdAsync(int roleId);
     }
 }

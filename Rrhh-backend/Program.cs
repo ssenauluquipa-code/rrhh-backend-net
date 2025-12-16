@@ -159,6 +159,12 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryEf>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 /*** Pemrision**/
 builder.Services.AddScoped<IPermissionRepository, PermissionRepositoryEf>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IPermissionAssignmentService, PermissionAssignmentService>();
+/**module**/
+builder.Services.AddScoped<IModuleRepository, ModuleRepositoryEf>();
+/***permision type**/
+builder.Services.AddScoped<IPermissionTypeRepository, PermissionTypeRepositoryEf>();
 
 
 //JWT AUTHENTICATION
