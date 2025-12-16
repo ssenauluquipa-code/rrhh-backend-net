@@ -12,8 +12,7 @@ namespace Rrhh_backend.Infrastructure.Data
         {
         }
 
-        public DbSet<Employee> Employees { get; set; } = null!;
-        public DbSet<RolePermission> RolePermissions { get; set; }            
+        public DbSet<Employee> Employees { get; set; } = null!;            
         /*Module Access*/
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
@@ -63,12 +62,6 @@ namespace Rrhh_backend.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
             });
-            //modelBuilder.Entity<RolePermission>(entity =>
-            //{
-            //    entity.HasKey(e => e.Id);
-            //    entity.HasOne(rp => rp.Role).WithMany(r => r.RolePermissions).HasForeignKey(rp => rp.RoleId);
-            //    entity.HasOne(rp => rp.Permission).WithMany(p => p.RolePermissions).HasForeignKey(rp => rp.PermissionId);
-            //});
 
             base.OnModelCreating(modelBuilder);
         }
