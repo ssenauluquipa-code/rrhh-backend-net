@@ -74,12 +74,12 @@ namespace Rrhh_backend.Presentation.Controllers
         }
         private int GetRoleIdFromClaims()
         {
-            var roleIdClaim = User.FindFirst("Id");
-            if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int Id))
+            var roleIdClaim = User.FindFirst("RoleId");
+            if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int roleId))
             {
                 throw new NotImplementedException("Implementar obtención de roleId");
             }
-            return Id;
+            return roleId;
         }
     }
 }

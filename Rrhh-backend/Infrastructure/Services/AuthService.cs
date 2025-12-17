@@ -163,7 +163,7 @@ namespace Rrhh_backend.Infrastructure.Services
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
-                    new Claim("Id", user.RoleId.ToString())
+                    new Claim("RoleId", user.RoleId.ToString())
                 }),
                 //Expires = DateTime.UtcNow.AddMinutes(_config.GetValue<int>("JwtSettings:ExpirationMinutes")),
                 Expires = DateTime.UtcNow.AddHours(1),
