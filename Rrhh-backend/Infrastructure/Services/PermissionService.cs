@@ -19,47 +19,26 @@ namespace Rrhh_backend.Infrastructure.Services
             _permissionTypeRepository = permissionTypeRepository;
         }
 
+        // En PermissionService.cs
         public async Task<PermissionResponse> GetUserPermissionsAsync(int roleId)
         {
             try
             {
-                // 🔍 Diagnóstico: Verifica entrada
-                Console.WriteLine($"🔍 Obteniendo permisos para RoleId: {roleId}");
-
                 var permissions = await _permissionRepository.GetActiveByRoleIdAsync(roleId);
-                Console.WriteLine($"🔍 Permisos encontrados: {permissions?.Count ?? 0}");
-
                 if (permissions == null || !permissions.Any())
-                {
-                    Console.WriteLine("⚠️ No se encontraron permisos para este rol");
                     return new PermissionResponse { Permissions = new Dictionary<string, List<string>>() };
-                }
 
                 var modules = await _moduleRepository.GetAllAsync();
                 var permissionTypes = await _permissionTypeRepository.GetAllAsync();
 
-                Console.WriteLine($"🔍 Módulos cargados: {modules?.Count ?? 0}");
-                Console.WriteLine($"🔍 Tipos de permiso cargados: {permissionTypes?.Count ?? 0}");
+                // 🔑 CONSTRUCCIÓN SEGURA DE DICCIONARIOS
+                var moduleDict = modules
+                    .Where(m => m != null && !string.IsNullOrWhiteSpace(m.ModuleKey))
+                    .ToDictionary(m => m.ModuleId, m => m.ModuleKey.Trim());
 
-                // Verifica que no haya nulos en módulos/tipos
-                if (modules == null || permissionTypes == null)
-                    throw new InvalidOperationException("No se pudieron cargar módulos o tipos de permiso");
-
-                // Crea diccionarios con validación
-                var moduleDict = new Dictionary<int, string>();
-                var typeDict = new Dictionary<int, string>();
-
-                foreach (var m in modules)
-                {
-                    if (m?.ModuleId > 0 && !string.IsNullOrEmpty(m.ModuleKey))
-                        moduleDict[m.ModuleId] = m.ModuleKey;
-                }
-
-                foreach (var pt in permissionTypes)
-                {
-                    if (pt?.PermissionTypeId > 0 && !string.IsNullOrEmpty(pt.Code))
-                        typeDict[pt.PermissionTypeId] = pt.Code;
-                }
+                var typeDict = permissionTypes
+                    .Where(pt => pt != null && !string.IsNullOrWhiteSpace(pt.Code))
+                    .ToDictionary(pt => pt.PermissionTypeId, pt => pt.Code.Trim());
 
                 var permissionsDict = new Dictionary<string, List<string>>();
 
@@ -78,7 +57,6 @@ namespace Rrhh_backend.Infrastructure.Services
                     }
                 }
 
-                Console.WriteLine($"✅ Permisos procesados: {permissionsDict.Count} módulos");
                 return new PermissionResponse { Permissions = permissionsDict };
             }
             catch (Exception ex)

@@ -56,30 +56,24 @@ namespace Rrhh_backend.Presentation.Controllers
             }
         }
 
-        [HttpGet("permissions")]        
+        [HttpGet("permissions")]
+        [Authorize]
         public async Task<IActionResult> GetUserPermissions()
         {
             try
             {
-                // 🔍 Diagnóstico: Verifica claims
-                var allClaims = User.Claims.Select(c => $"{c.Type}={c.Value}");
-                Console.WriteLine($"Claims: {string.Join(", ", allClaims)}");
-
+                // 🔑 OBTIENE ROLEID DEL TOKEN
                 var roleIdClaim = User.FindFirst("RoleId");
-                if (roleIdClaim == null)
-                    return BadRequest("Token no contiene RoleId");
+                if (roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int roleId))
+                    return BadRequest("Token no contiene RoleId válido");
 
-                if (!int.TryParse(roleIdClaim.Value, out int roleId) || roleId <= 0)
-                    return BadRequest("RoleId inválido en token");
-
-                Console.WriteLine($"🔍 Buscando permisos para RoleId: {roleId}");
-
+                // 🔑 OBTIENE PERMISOS
                 var permissions = await _permissionService.GetUserPermissionsAsync(roleId);
                 return Ok(new { success = true, data = permissions });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 ERROR EN CONTROLADOR: {ex}");
+                Console.WriteLine($"ERROR EN AuthController: {ex.Message}");
                 return StatusCode(500, new { success = false, message = "Error al cargar permisos" });
             }
         }
