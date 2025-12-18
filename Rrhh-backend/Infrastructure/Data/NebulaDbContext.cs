@@ -51,6 +51,8 @@ namespace Rrhh_backend.Infrastructure.Data
             modelBuilder.Entity<Module>(entity =>
             {
                 entity.HasKey(m => m.ModuleId);
+                entity.HasIndex(m => m.ModuleKey).IsUnique();
+                entity.Property(m => m.IsActive).HasDefaultValue(true);
             });
             ///
             modelBuilder.Entity<PermissionType>(entity =>

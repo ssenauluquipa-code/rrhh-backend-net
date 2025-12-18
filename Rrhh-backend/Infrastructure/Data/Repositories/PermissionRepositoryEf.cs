@@ -39,6 +39,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         public async Task<List<Permission>> GetActiveByRoleIdAsync(int roleId)
         {
             return await _context.Permissions
+            .Include(p => p.Module)
+            .Include(p => p.PermissionType)
             .Where(p => p.RoleId == roleId && p.IsActive)
             .ToListAsync();
         }
