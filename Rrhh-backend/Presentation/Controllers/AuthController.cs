@@ -56,30 +56,44 @@ namespace Rrhh_backend.Presentation.Controllers
             }
         }
 
-        [HttpGet("permissions")]
-        [Authorize]
+        [HttpGet("permissions")]        
         public async Task<IActionResult> GetUserPermissions()
         {
             try
             {
-                // Asumiendo que obtienes el roleId del usuario actual
-                var roleId = GetRoleIdFromClaims(); // Implementa esta lógica
+                // 🔍 Diagnóstico: Verifica claims
+                var allClaims = User.Claims.Select(c => $"{c.Type}={c.Value}");
+                Console.WriteLine($"Claims: {string.Join(", ", allClaims)}");
+
+                var roleIdClaim = User.FindFirst("RoleId");
+                if (roleIdClaim == null)
+                    return BadRequest("Token no contiene RoleId");
+
+                if (!int.TryParse(roleIdClaim.Value, out int roleId) || roleId <= 0)
+                    return BadRequest("RoleId inválido en token");
+
+                Console.WriteLine($"🔍 Buscando permisos para RoleId: {roleId}");
+
                 var permissions = await _permissionService.GetUserPermissionsAsync(roleId);
                 return Ok(new { success = true, data = permissions });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"🚨 ERROR EN CONTROLADOR: {ex}");
                 return StatusCode(500, new { success = false, message = "Error al cargar permisos" });
             }
         }
-        private int GetRoleIdFromClaims()
-        {
-            var roleIdClaim = User.FindFirst("RoleId");
-            if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int roleId))
-            {
-                throw new NotImplementedException("Implementar obtención de roleId");
-            }
-            return roleId;
-        }
+
+        //private int GetRoleIdFromClaims()
+        //{
+        //    var roleIdClaim = User.FindFirst("RoleId");
+        //    if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int roleId))
+        //    {
+        //        throw new NotImplementedException("Implementar obtención de roleId");
+        //    }
+        //    return roleId;
+        //}
+
+
     }
 }

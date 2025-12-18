@@ -38,11 +38,27 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 
         public async Task<List<Permission>> GetActiveByRoleIdAsync(int roleId)
         {
-            return await _context.Permissions
-            .Include(p => p.Module)
-            .Include(p => p.PermissionType)
-            .Where(p => p.RoleId == roleId && p.IsActive)
-            .ToListAsync();
+            try
+            {
+                var permissions = await _context.Permissions
+                    .Include(p => p.Module)
+                    .Include(p => p.PermissionType)
+                    .Where(p => p.RoleId == roleId && p.IsActive)
+                    .ToListAsync();
+
+                // Depuración: verifica que las relaciones se cargaron
+                foreach (var p in permissions)
+                {
+                    Console.WriteLine($"Permiso: ModuleId={p.ModuleId}, ModuleKey={p.Module?.ModuleKey}, Code={p.PermissionType?.Code}");
+                }
+
+                return permissions;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"💥 ERROR EN REPOSITORIO: {ex}");
+                throw;
+            }
         }
     }
 }
