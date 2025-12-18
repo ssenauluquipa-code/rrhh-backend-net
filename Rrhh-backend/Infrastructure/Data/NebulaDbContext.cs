@@ -35,14 +35,19 @@ namespace Rrhh_backend.Infrastructure.Data
             });
             /*access*/
             modelBuilder.Entity<Permission>(entity =>
-            {
-                entity.HasKey(e => e.PermissionId);
+            {                
                 //relaciones
-                entity.HasOne(p => p.Role).WithMany().HasForeignKey(p => p.RoleId);
+                entity.HasOne(p => p.Role)
+                      .WithMany()
+                      .HasForeignKey(p => p.RoleId);
 
-                entity.HasOne(p => p.Module).WithMany().HasForeignKey(p => p.ModuleId);
+                entity.HasOne(p => p.Module)
+                      .WithMany(m => m.Permissions)
+                      .HasForeignKey(p => p.ModuleId);
 
-                entity.HasOne(p => p.PermissionType).WithMany().HasForeignKey(p => p.PermissionTypeId);
+                entity.HasOne(p => p.PermissionType)
+                      .WithMany()
+                      .HasForeignKey(p => p.PermissionTypeId);
 
                 //indice unico: un rol no puede tener el mismo permiso duplicado
                 entity.HasIndex(p => new { p.RoleId, p.ModuleId, p.PermissionTypeId }).IsUnique();

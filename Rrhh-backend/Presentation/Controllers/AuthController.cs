@@ -74,7 +74,13 @@ namespace Rrhh_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"ERROR EN AuthController: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Error al cargar permisos" });
+                // 🔑 DEVUELVE EL ERROR REAL EN LA RESPUESTA
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message,
+                    stackTrace = ex.StackTrace // Solo para diagnóstico
+                });
             }
         }
 
