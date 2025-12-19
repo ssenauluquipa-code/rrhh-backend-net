@@ -35,7 +35,8 @@ namespace Rrhh_backend.Infrastructure.Data
             });
             /*access*/
             modelBuilder.Entity<Permission>(entity =>
-            {                
+            {
+                entity.HasKey(e => e.PermissionId);
                 //relaciones
                 entity.HasOne(p => p.Role)
                       .WithMany()

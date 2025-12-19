@@ -38,27 +38,28 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 
         public async Task<List<Permission>> GetActiveByRoleIdAsync(int roleId)
         {
-            try
-            {
-                var permissions = await _context.Permissions
-                    .Include(p => p.Module)
-                    .Include(p => p.PermissionType)
-                    .Where(p => p.RoleId == roleId && p.IsActive)
-                    .ToListAsync();
+            var permissions = await _context.Permissions
+                .Include(p => p.Module)
+                .Include(p => p.PermissionType)
+                .Where(p => p.RoleId == roleId && p.IsActive)
+                .ToListAsync();
 
-                // Depuración: verifica que las relaciones se cargaron
-                foreach (var p in permissions)
+            // Verificación adicional: asegura que las relaciones no sean nulas
+            foreach (var perm in permissions)
+            {
+                if (perm.Module == null)
                 {
-                    Console.WriteLine($"Permiso: ModuleId={p.ModuleId}, ModuleKey={p.Module?.ModuleKey}, Code={p.PermissionType?.Code}");
+                    var moduleId = perm.ModuleId;
+                    perm.Module = await _context.Modules.FirstOrDefaultAsync(m => m.ModuleId == moduleId);
                 }
+                if (perm.PermissionType == null)
+                {
+                    var typeId = perm.PermissionTypeId;
+                    perm.PermissionType = await _context.PermissionTypes.FirstOrDefaultAsync(pt => pt.PermissionTypeId == typeId);
+                }
+            }
 
-                return permissions;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"💥 ERROR EN REPOSITORIO: {ex}");
-                throw;
-            }
+            return permissions;
         }
     }
 }

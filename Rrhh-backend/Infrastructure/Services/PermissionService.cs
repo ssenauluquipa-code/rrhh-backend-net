@@ -28,44 +28,33 @@ namespace Rrhh_backend.Infrastructure.Services
                 if (permissions == null || !permissions.Any())
                     return new PermissionResponse { Permissions = new Dictionary<string, List<string>>() };
 
-                var modules = await _moduleRepository.GetAllAsync();
-                var permissionTypes = await _permissionTypeRepository.GetAllAsync();
-
-                // 🔑 CONSTRUCCIÓN SEGURA DE DICCIONARIOS
-                var moduleDict = modules
-                    .Where(m => m != null && !string.IsNullOrWhiteSpace(m.ModuleKey))
-                    .ToDictionary(m => m.ModuleId, m => m.ModuleKey.Trim());
-
-                var typeDict = permissionTypes
-                    .Where(pt => pt != null && !string.IsNullOrWhiteSpace(pt.Code))
-                    .ToDictionary(pt => pt.PermissionTypeId, pt => pt.Code.Trim());
-
                 var permissionsDict = new Dictionary<string, List<string>>();
 
                 foreach (var perm in permissions)
                 {
-                    if (moduleDict.TryGetValue(perm.ModuleId, out var moduleKey) &&
-                        typeDict.TryGetValue(perm.PermissionTypeId, out var permCode))
-                    {
-                        if (!permissionsDict.ContainsKey(moduleKey))
-                            permissionsDict[moduleKey] = new List<string>();
-                        permissionsDict[moduleKey].Add(permCode);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"⚠️ Permiso huérfano: ModuleId={perm.ModuleId}, PermissionTypeId={perm.PermissionTypeId}");
-                    }
+                    if (perm.Module?.ModuleKey == null || perm.PermissionType?.Code == null)
+                        continue;
+
+                    var moduleKey = perm.Module.ModuleKey.Trim();
+                    var permCode = perm.PermissionType.Code.Trim();
+
+                    if (string.IsNullOrEmpty(moduleKey) || string.IsNullOrEmpty(permCode))
+                        continue;
+
+                    if (!permissionsDict.ContainsKey(moduleKey))
+                        permissionsDict[moduleKey] = new List<string>();
+
+                    permissionsDict[moduleKey].Add(permCode);
                 }
 
                 return new PermissionResponse { Permissions = permissionsDict };
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🔥 ERROR EN SERVICIO: {ex}");
+                Console.WriteLine($"ERROR EN SERVICIO: {ex}");
                 throw;
             }
         }
-
 
         //public async Task<PermissionResponse> GetUserPermissionsAsync(int roleId)
         //{
