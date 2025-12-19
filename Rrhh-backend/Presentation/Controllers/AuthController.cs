@@ -84,16 +84,33 @@ namespace Rrhh_backend.Presentation.Controllers
             }
         }
 
-        //private int GetRoleIdFromClaims()
-        //{
-        //    var roleIdClaim = User.FindFirst("RoleId");
-        //    if(roleIdClaim == null || !int.TryParse(roleIdClaim.Value, out int roleId))
-        //    {
-        //        throw new NotImplementedException("Implementar obtención de roleId");
-        //    }
-        //    return roleId;
-        //}
+        [HttpPost("refresh")]
+        public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.AccessToken))
+                    return BadRequest("Token no proporcionado");
 
-
+                if (_authService.IsTokenExpired(request.AccessToken))
+                {
+                    var newToken = _authService.RefreshToken(request.AccessToken);
+                    return Ok(new { success = true, token = newToken });
+                }
+                else
+                {
+                    // Token aún válido, devolver el mismo
+                    return Ok(new { success = true, token = request.AccessToken });
+                }
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Error al renovar token" });
+            }
+        }
     }
 }

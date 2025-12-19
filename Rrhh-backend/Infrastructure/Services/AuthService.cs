@@ -174,6 +174,55 @@ namespace Rrhh_backend.Infrastructure.Services
             return tokenHandler.WriteToken(token);
         }
 
-            
+        //verificamos si el token esta a punto de expirar
+        public bool IsTokenExpired(string token)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                var expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp");
+                if (expClaim == null) return true; // Si no tiene expiración, considera expirado
+
+                var expTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim.Value)).UtcDateTime;
+                return expTime <= DateTime.UtcNow.AddMinutes(5); // Si expira en menos de 5 minutos
+            }
+            catch
+            {
+                return true; // Si no se puede leer, considera expirado
+            }
+        }
+
+        //con esto refrescamos el token
+        public string RefreshToken(string expiredToken)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(expiredToken);
+
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+                var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+                if (userIdClaim == null || emailClaim == null || roleClaim == null)
+                    throw new BusinessException("Token inválido");
+
+                // Busca el usuario en la BD (para generar nuevo token con datos actuales)
+                var userId = int.Parse(userIdClaim.Value);
+                var user = _userRepository.GetUserByIdAsync(userId).Result; // O usa async/await
+
+                if (user == null)
+                    throw new BusinessException("Usuario no encontrado");
+
+                // Genera nuevo token
+                return GenerateTokenJWT(user);
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException("No se pudo renovar el token: " + ex.Message);
+            }
+        }
     }
 }

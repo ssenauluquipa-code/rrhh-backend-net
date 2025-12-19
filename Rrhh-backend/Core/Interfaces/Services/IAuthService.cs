@@ -9,5 +9,8 @@ namespace Rrhh_backend.Core.Interfaces.Services
         Task<bool> LogoutAsync(string token);
         bool ValidateToken(string token);
 
+        string RefreshToken(string expiredToken);
+        bool IsTokenExpired(string token);
+
     }
 }
