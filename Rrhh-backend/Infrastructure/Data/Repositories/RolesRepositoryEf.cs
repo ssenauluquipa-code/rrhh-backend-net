@@ -15,7 +15,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 
         public async Task<List<Role>> GetRolesAllAsync()
         {
-            return await _context.Roles.Where(r => r.IsActive).ToListAsync();
+            return await _context.Roles.ToListAsync();
         }
         public async Task<Role?> GetRolesByIdAsync(int id)
         {
