@@ -29,8 +29,8 @@ builder.Services.AddControllers()
 
 // Configuración de Swagger (solo en desarrollo)
 builder.Services.AddEndpointsApiExplorer();
-if (builder.Environment.IsDevelopment())
-{
+//if (builder.Environment.IsDevelopment())
+//{
     builder.Services.AddSwaggerGen(c =>
     {
         // 1. Información general de la API (ajusta según tu proyecto)
@@ -81,11 +81,11 @@ if (builder.Environment.IsDevelopment())
         // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         // c.IncludeXmlComments(xmlPath); // Descomenta si tienes XML activado
     });
-}else
-{
-    // En producción, no incluyas Swagger
-    builder.Services.AddSwaggerGen(); // Aunque no se use, es buena práctica incluirlo si el paquete está instalado
-}
+//}else
+//{
+//    // En producción, no incluyas Swagger
+//    builder.Services.AddSwaggerGen(); // Aunque no se use, es buena práctica incluirlo si el paquete está instalado
+//}
 //// 🧾 Configurar Swagger con definición de seguridad JWT
 //builder.Services.AddSwaggerGen(c =>
 //{
@@ -213,8 +213,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Middleware
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI(
         c =>
@@ -222,7 +222,7 @@ if (app.Environment.IsDevelopment())
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "API NEBULA v1");
         }
         );
-}
+//}
 // En producción, no se ejecuta UseSwagger ni UseSwaggerUI
 
 app.UseHttpsRedirection();
