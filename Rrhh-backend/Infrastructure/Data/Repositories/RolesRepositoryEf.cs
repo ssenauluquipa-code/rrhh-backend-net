@@ -46,14 +46,11 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<bool> IsActivateRoles(int id)
         {
-            var activated = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
-            if(activated != null && !activated.IsActive)
-            {
-                activated.IsActive = true;
-                await _context.SaveChangesAsync();
-                return false;
-            }
-            return true;
+            var activated = await _context.Roles.FindAsync(id);
+            if (activated == null) return false;
+
+            activated.IsActive = true;
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<Role?> GetByNameAsync(string name)

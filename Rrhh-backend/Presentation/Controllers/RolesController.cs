@@ -61,8 +61,10 @@ namespace Rrhh_backend.Presentation.Controllers
         public async Task<IActionResult> ActivateRoles(int id)
         {
             var result = await _rolesService.ActivatedAsync(id);
-            if (!result) return NotFound(new { message = "no se cmabio ocurrio un error" });
-            return Ok(result);
+            if (!result) { 
+                return NotFound(new { message = "no se cambio, ocurrio un error" });
+            } 
+            return Ok();
         }
     }
 }
