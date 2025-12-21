@@ -65,8 +65,6 @@ namespace Rrhh_backend.Infrastructure.Services
 
             role.RoleName = request.RoleName;
             role.Description = request.Description;
-            role.IsActive = request.IsActivate;
-
             //if (!string.IsNullOrEmpty(request.RoleName))
             //    roles.RoleName = request.RoleName;
             //if (!string.IsNullOrEmpty(request.Description))
