@@ -19,7 +19,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         }
         public async Task<Role?> GetRolesByIdAsync(int id)
         {
-            return await _context.Roles.FirstOrDefaultAsync(r => r.Id == id && r.IsActive);
+            return await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
         }
         public async Task<Role> CreatedRoles(Role roles)
         {
