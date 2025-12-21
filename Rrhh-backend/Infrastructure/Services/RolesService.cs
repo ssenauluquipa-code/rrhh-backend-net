@@ -30,7 +30,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 Id = roles.Id,
                 RoleName = roles.RoleName,
                 Description = roles.Description,
-                IsActivate = roles.IsActive
+                IsActive = roles.IsActive
             };
         }
         public async Task<RolesResponse> CreatedRolesAsync(CreateRolesRequest request)
@@ -52,7 +52,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 Id = role.Id,
                 RoleName = role.RoleName,
                 Description = role.Description,
-                IsActivate = role.IsActive
+                IsActive = role.IsActive
             };
         }
         public async Task<RolesResponse?> UpdateRolesAsync(int id ,UpdateRolesRequest request)
@@ -79,7 +79,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 Id = role.Id,
                 RoleName = role.RoleName,
                 Description = role.Description,
-                IsActivate = role.IsActive
+                IsActive = role.IsActive
             };
         }
         public async Task<bool> DeletedAsync(int id)
@@ -98,7 +98,7 @@ namespace Rrhh_backend.Infrastructure.Services
                 Id = roles.Id,
                 RoleName = roles.RoleName,
                 Description = roles.Description,
-                IsActivate = roles.IsActive,
+                IsActive = roles.IsActive,
                 CreatedAt = roles.CreatedAt,
                 UpdatedAt = roles.UpdatedAt
             };
