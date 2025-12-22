@@ -53,7 +53,7 @@ namespace Rrhh_backend.Presentation.Controllers
         public async Task<IActionResult>DeleteRoles(int id)
         {
             var result = await _rolesService.DeletedAsync(id);
-            if (!result) return NotFound(new { message = "se cambio d eestado de forma correcta" });
+            if (!result) return NotFound(new { message = "se cambio de estado de forma correcta" });
             return NoContent();
         }
 
@@ -62,10 +62,10 @@ namespace Rrhh_backend.Presentation.Controllers
         {
             var result = await _rolesService.ActivatedAsync(id);
             if (!result) { 
-                return NotFound(new { success = false, message = "Rol no encontrado o ya estaba desactivado" });
+                return NotFound(new { success = false, message = "Rol no encontrado o ya esta activado" });
                 
             }
-            return Ok(new { success = true, message = "Rol desactivado exitosamente" });
+            return Ok(new { success = true, message = "Rol activado exitosamente" });
         }
     }
 }
