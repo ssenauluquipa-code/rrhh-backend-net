@@ -62,9 +62,10 @@ namespace Rrhh_backend.Presentation.Controllers
         {
             var result = await _rolesService.ActivatedAsync(id);
             if (!result) { 
-                return NotFound(new { message = "no se cambio, ocurrio un error" });
-            } 
-            return Ok();
+                return NotFound(new { success = false, message = "Rol no encontrado o ya estaba desactivado" });
+                
+            }
+            return Ok(new { success = true, message = "Rol desactivado exitosamente" });
         }
     }
 }

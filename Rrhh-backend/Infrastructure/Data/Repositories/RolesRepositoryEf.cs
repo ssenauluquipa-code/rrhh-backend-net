@@ -40,7 +40,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             {
                 deleted.IsActive = false;
                 await _context.SaveChangesAsync();
-                return false;
+                return true;
             }
             return false;
         }
