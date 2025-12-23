@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rrhh_backend.Core.Entities;
+using Rrhh_backend.Core.Entities.ModuleEspecial;
 using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Infrastructure.Services;
 using Rrhh_backend.Presentation.DTOs.Requests.Permission;
@@ -54,6 +55,20 @@ namespace Rrhh_backend.Presentation.Controllers
             {
                 var permissionTypes = await _assignmentService.GetAllPermissionTypesAsync();
                 return Ok(new { success = true, data = permissionTypes });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet("modules")]
+        public async Task<ActionResult<List<Module>>> GetAllModules()
+        {
+            try
+            {
+                var modules = await _assignmentService.GetAllModulesAsync();
+                return Ok(new { success = true, data = modules });
             }
             catch (Exception ex)
             {
