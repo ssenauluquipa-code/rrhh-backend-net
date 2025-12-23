@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Rrhh_backend.Core.Entities;
 using Rrhh_backend.Core.Interfaces.Services;
-using Rrhh_backend.Presentation.DTOs.Requests;
+using Rrhh_backend.Infrastructure.Services;
+using Rrhh_backend.Presentation.DTOs.Requests.Permission;
+using Rrhh_backend.Presentation.DTOs.Responses.Permissions;
 
 namespace Rrhh_backend.Presentation.Controllers
 {
@@ -15,38 +18,48 @@ namespace Rrhh_backend.Presentation.Controllers
         {
             _assignmentService = assignmentService;
         }
-        [HttpGet("{roleId}")]
-        public async Task<IActionResult> LoadAssignment(int roleId)
-        {
-            try
-            {
-                var response = await _assignmentService.LoadAssignmentAsync(roleId);
-                return Ok(new { success = true, data = response });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = "Error al cargar permisos" });
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> SaveAssignment([FromBody] PermissionAssignmentRequest request)
-        {
-            if (request.RoleId <= 0 || request.Modules == null)
-                return BadRequest(new { success = false, message = "Datos inválidos" });
 
+        [HttpGet("role/{roleId}")]
+        public async Task<ActionResult<PermissionAssignmentResponse>> GetAssignmentByRole(int roleId)
+        {
             try
             {
-                await _assignmentService.SaveAssignmentAsync(request);
-                return Ok(new { success = true, message = "Permisos guardados correctamente" });
+                var assignment = await _assignmentService.GetAssignmentByRoleAsync(roleId);
+                return Ok(new { success = true, data = assignment });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = "Error al guardar permisos" });
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpPost("assign")]
+        public async Task<IActionResult> AssignPermissions([FromBody] PermissionAssignmentRequest request)
+        {
+            try
+            {
+                await _assignmentService.AssignPermissionsAsync(request);
+                return Ok(new { success = true, message = "Permisos asignados exitosamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet("permission-types")]
+        public async Task<ActionResult<List<PermissionType>>> GetAllPermissionTypes()
+        {
+            try
+            {
+                var permissionTypes = await _assignmentService.GetAllPermissionTypesAsync();
+                return Ok(new { success = true, data = permissionTypes });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }

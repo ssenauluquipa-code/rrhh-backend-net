@@ -161,6 +161,7 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 /*** Pemrision**/
 builder.Services.AddScoped<IPermissionRepository, PermissionRepositoryEf>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IPermissionAssignmentRepository, PermissionAssignmentRepositoryEf>();
 builder.Services.AddScoped<IPermissionAssignmentService, PermissionAssignmentService>();
 /**module**/
 builder.Services.AddScoped<IModuleRepository, ModuleRepositoryEf>();

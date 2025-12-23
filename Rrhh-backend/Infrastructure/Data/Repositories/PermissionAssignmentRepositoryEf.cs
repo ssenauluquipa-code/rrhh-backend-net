@@ -1,46 +1,59 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rrhh_backend.Core.Entities;
+using Rrhh_backend.Core.Entities.ModuleEspecial;
 using Rrhh_backend.Core.Interfaces.Repositories;
+using Rrhh_backend.Presentation.DTOs.Requests.Permission;
 using Rrhh_backend.Presentation.DTOs.Responses.Permissions;
 
 namespace Rrhh_backend.Infrastructure.Data.Repositories
 {
-    public class PermissionTypeRepositoryEf : IPermissionTypeRepository
+    public class PermissionAssignmentRepositoryEf : IPermissionAssignmentRepository
     {
         private readonly NebulaDbContext _context;
 
-        public PermissionTypeRepositoryEf(NebulaDbContext context)
+        public PermissionAssignmentRepositoryEf(NebulaDbContext nebulaDbContext)
         {
-            _context = context;
+            _context = nebulaDbContext;
         }
 
-        public async Task<PermissionType> CreateAsync(PermissionType permissionType)
+        public async Task AssignPermissionsAsync(PermissionAssignmentRequest request)
         {
-            _context.PermissionTypes.Add(permissionType);
-            await _context.SaveChangesAsync();
-            return permissionType;
-        }
+            // Eliminar permisos existentes para el rol
+            var existingPermissions = await _context.Permissions
+                .Where(p => p.RoleId == request.RoleId)
+                .ToListAsync();
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var permissionType = await _context.PermissionTypes.FindAsync(id);
-            if (permissionType != null)
+            _context.Permissions.RemoveRange(existingPermissions);
+
+            // Crear nuevos permisos
+            var newPermissions = new List<Permission>();
+            foreach (var permissionDetail in request.Permissions)
             {
-                _context.PermissionTypes.Remove(permissionType);
-                await _context.SaveChangesAsync();
-                return true;
+                foreach (var permissionTypeId in permissionDetail.PermissionTypeIds)
+                {
+                    newPermissions.Add(new Permission
+                    {
+                        RoleId = request.RoleId,
+                        ModuleId = permissionDetail.ModuleId,
+                        PermissionTypeId = permissionTypeId,
+                        IsActive = true,
+                        AssignedAt = DateTime.UtcNow
+                    });
+                }
             }
-            return false;
+
+            await _context.Permissions.AddRangeAsync(newPermissions);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<List<PermissionType>> GetAllAsync()
+        public async Task<List<Module>> GetAllModulesAsync()
+        {
+            return await _context.Modules.ToListAsync();
+        }
+
+        public async Task<List<PermissionType>> GetAllPermissionTypesAsync()
         {
             return await _context.PermissionTypes.ToListAsync();
-        }
-
-        public Task<PermissionType?> GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<PermissionAssignmentResponse> GetByRoleIdAsync(int roleId)
@@ -88,12 +101,16 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             }
 
             return response;
-
         }
 
-        public Task<PermissionType?> UpdateAsync(int id, PermissionType permissionType)
+        public async Task RemovePermissionsByRoleAsync(int roleId)
         {
-            throw new NotImplementedException();
+            var permissions = await _context.Permissions
+    .Where(p => p.RoleId == roleId)
+    .ToListAsync();
+
+            _context.Permissions.RemoveRange(permissions);
+            await _context.SaveChangesAsync();
         }
     }
 }

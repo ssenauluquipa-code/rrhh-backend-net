@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rrhh_backend.Core.Entities;
+using Rrhh_backend.Core.Entities.ModuleEspecial;
+using Rrhh_backend.Core.Exceptions;
 using Rrhh_backend.Core.Interfaces.Repositories;
 using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Infrastructure.Data;
-using Rrhh_backend.Presentation.DTOs.Requests;
-using Rrhh_backend.Presentation.DTOs.Responses;
+using Rrhh_backend.Presentation.DTOs.Requests.Permission;
+using Rrhh_backend.Presentation.DTOs.Responses.Permissions;
 
 namespace Rrhh_backend.Infrastructure.Services
 {
@@ -14,113 +16,63 @@ namespace Rrhh_backend.Infrastructure.Services
         private readonly IRolesRepository _roleRepository;
         private readonly IModuleRepository _moduleRepository;
         private readonly IPermissionTypeRepository _permissionTypeRepository;
+        private readonly IPermissionAssignmentRepository _permissionAssignmentRepository;
 
         public PermissionAssignmentService(NebulaDbContext context,
                                            IRolesRepository roleRepository,
                                            IModuleRepository moduleRepository,
-                                           IPermissionTypeRepository permissionTypeRepository)
+                                           IPermissionTypeRepository permissionTypeRepository,
+                                           IPermissionAssignmentRepository permissionAssignmentRepository
+            )
         {
             _context = context;
             _roleRepository = roleRepository;
             _moduleRepository = moduleRepository;
             _permissionTypeRepository = permissionTypeRepository;
+            _permissionAssignmentRepository = permissionAssignmentRepository;
         }
 
-        public async Task<PermissionAssignmentResponse> LoadAssignmentAsync(int roleId)
+        public async Task AssignPermissionsAsync(PermissionAssignmentRequest request)
+        {
+            var role = await _roleRepository.GetRolesByIdAsync(request.RoleId);
+            if (role == null)
+                throw new BusinessException("Rol no encontrado");
+
+            // Validar que los módulos y tipos de permiso existan
+            foreach (var permissionDetail in request.Permissions)
+            {
+                var module = await _moduleRepository.GetModulesByIdAsync(permissionDetail.ModuleId);
+                if (module == null)
+                    throw new BusinessException($"Módulo con ID {permissionDetail.ModuleId} no encontrado");
+
+                foreach (var permissionTypeId in permissionDetail.PermissionTypeIds)
+                {
+                    var permissionType = await _permissionTypeRepository.GetByIdAsync(permissionTypeId);
+                    if (permissionType == null)
+                        throw new BusinessException($"Tipo de permiso con ID {permissionTypeId} no encontrado");
+                }
+            }
+
+            await _permissionAssignmentRepository.AssignPermissionsAsync(request);
+        }
+
+        public async Task<List<Module>> GetAllModulesAsync()
+        {
+            return await _permissionAssignmentRepository.GetAllModulesAsync();
+        }
+
+        public async Task<List<PermissionType>> GetAllPermissionTypesAsync()
+        {
+            return await _permissionAssignmentRepository.GetAllPermissionTypesAsync();
+        }
+
+        public async Task<PermissionAssignmentResponse> GetAssignmentByRoleAsync(int roleId)
         {
             var role = await _roleRepository.GetRolesByIdAsync(roleId);
             if (role == null)
-                throw new KeyNotFoundException("Rol no encontrado");
+                throw new BusinessException("Rol no encontrado");
 
-            var modules = await _moduleRepository.GetAllAsync();
-            var permissionTypes = await _permissionTypeRepository.GetAllAsync();
-            var currentPermissions = await _context.Permissions
-                .Where(p => p.RoleId == roleId && p.IsActive)
-                .ToListAsync();
-
-            var permDict = currentPermissions
-                .ToDictionary(p => (p.ModuleId, p.PermissionTypeId), p => true);
-
-            var categorizedModules = new Dictionary<string, List<ModulePermissionItem>>();
-            foreach (var module in modules)
-            {
-                var permissions = new Dictionary<string, bool>();
-                foreach (var pt in permissionTypes)
-                {
-                    var key = (ModuleId: module.ModuleId, PermissionTypeId: pt.PermissionTypeId);
-                    permissions[pt.Code] = permDict.ContainsKey(key);
-                }
-                var item = new ModulePermissionItem
-                {
-                    ModuleId = module.ModuleId,
-                    Name = module.ModuleName,
-                    Key = module.ModuleKey,
-                    Permissions = permissions
-                };
-
-                if (!categorizedModules.ContainsKey(module.Category))
-                    categorizedModules[module.Category] = new List<ModulePermissionItem>();
-
-                categorizedModules[module.Category].Add(item);
-            }
-
-            var responseModule = new ModulePermissionResponse
-            {
-                ModuleId = modules.FirstOrDefault()?.ModuleId ?? 0,
-                Name = modules.FirstOrDefault()?.ModuleName ?? "",
-                Key = modules.FirstOrDefault()?.ModuleKey ?? "",
-                Categories = categorizedModules
-            };
-
-            return new PermissionAssignmentResponse
-            {
-                RoleId = roleId,
-                RoleName = role.RoleName,
-                Modules = new List<ModulePermissionResponse> { responseModule }
-            };
-        }
-
-        public async Task SaveAssignmentAsync(PermissionAssignmentRequest request)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
-            {
-                var existingPermissions = await _context.Permissions
-                    .Where(p => p.RoleId == request.RoleId)
-                    .ToListAsync();
-
-                _context.Permissions.RemoveRange(existingPermissions);
-
-                var permissionTypes = await _permissionTypeRepository.GetAllAsync();
-                var permTypeDict = permissionTypes.ToDictionary(pt => pt.Code, pt => pt.PermissionTypeId);
-
-                foreach (var moduleDto in request.Modules)
-                {
-                    foreach (var (permCode, isActive) in moduleDto.Permissions)
-                    {
-                        if (isActive && permTypeDict.TryGetValue(permCode, out var permTypeId))
-                        {
-                            _context.Permissions.Add(new Permission
-                            {
-                                RoleId = request.RoleId,
-                                ModuleId = moduleDto.ModuleId,
-                                PermissionTypeId = permTypeId,
-                                IsActive = true,
-                                AssignedAt = DateTime.UtcNow
-                            });
-                        }
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            return await _permissionTypeRepository.GetByRoleIdAsync(roleId);
         }
     }
 }

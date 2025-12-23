@@ -19,5 +19,10 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                 .Where(m => m.IsActive)
                 .ToListAsync();
         }
+
+        public async Task<Module?> GetModulesByIdAsync(int id)
+        {
+            return await _context.Modules.FindAsync(id);
+        }
     }
 }
