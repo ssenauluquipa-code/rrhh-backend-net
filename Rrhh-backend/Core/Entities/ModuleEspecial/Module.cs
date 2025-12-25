@@ -12,6 +12,6 @@
         public bool IsActive { get; set; } = true;
         //relacion: un modulo puede estar asociado a muchos CompanyModule
         //public virtual ICollection<CompanyModule>? CompanyModules { get; set; }
-        public virtual ICollection<Permission>? Permissions { get; set; } = new List<Permission>();
+        //public virtual ICollection<Permission>? Permissions { get; set; } = new List<Permission>();
     }
 }

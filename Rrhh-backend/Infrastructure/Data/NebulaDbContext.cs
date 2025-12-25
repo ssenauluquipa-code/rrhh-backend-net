@@ -43,7 +43,7 @@ namespace Rrhh_backend.Infrastructure.Data
                       .HasForeignKey(p => p.RoleId);
 
                 entity.HasOne(p => p.Module)
-                      .WithMany(m => m.Permissions)
+                      .WithMany()
                       .HasForeignKey(p => p.ModuleId);
 
                 entity.HasOne(p => p.PermissionType)
