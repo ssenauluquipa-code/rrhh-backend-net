@@ -163,6 +163,8 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepositoryEf>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IPermissionAssignmentRepository, PermissionAssignmentRepositoryEf>();
 builder.Services.AddScoped<IPermissionAssignmentService, PermissionAssignmentService>();
+/* function */
+builder.Services.AddScoped<IFunctionRepository, FunctionRepositoryEf>();
 /**module**/
 builder.Services.AddScoped<IModuleRepository, ModuleRepositoryEf>();
 /***permision type**/

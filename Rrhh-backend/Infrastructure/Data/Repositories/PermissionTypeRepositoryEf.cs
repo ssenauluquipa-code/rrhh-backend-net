@@ -13,25 +13,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         {
             _context = context;
         }
-
-        public async Task<PermissionType> CreateAsync(PermissionType permissionType)
-        {
-            _context.PermissionTypes.Add(permissionType);
-            await _context.SaveChangesAsync();
-            return permissionType;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var permissionType = await _context.PermissionTypes.FindAsync(id);
-            if (permissionType != null)
-            {
-                _context.PermissionTypes.Remove(permissionType);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            return false;
-        }
+   
 
         public async Task<List<PermissionType>> GetAllAsync()
         {
@@ -41,59 +23,6 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         public Task<PermissionType?> GetByIdAsync(int id)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<PermissionAssignmentResponse> GetByRoleIdAsync(int roleId)
-        {
-            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
-            if (role == null) return null;
-
-            var permissions = await _context.Permissions
-                .Include(p => p.Module)
-                .Include(p => p.PermissionType)
-                .Where(p => p.RoleId == roleId)
-                .ToListAsync();
-
-            var response = new PermissionAssignmentResponse
-            {
-                RoleId = roleId,
-                RoleName = role.RoleName,
-                Modules = new List<ModulePermissionAssignment>()
-            };
-
-            // Agrupar permisos por módulo
-            var groupedByModule = permissions
-                .GroupBy(p => p.ModuleId)
-                .ToList();
-            foreach (var moduleGroup in groupedByModule)
-            {
-                var module = await _context.Modules.FirstOrDefaultAsync(m => m.ModuleId == moduleGroup.Key);
-                if (module != null)
-                {
-                    var moduleAssignment = new ModulePermissionAssignment
-                    {
-                        ModuleId = module.ModuleId,
-                        ModuleName = module.ModuleName,
-                        ModuleKey = module.ModuleKey,
-                        Permissions = moduleGroup.Select(p => new PermissionTypeAssignment
-                        {
-                            PermissionTypeId = p.PermissionTypeId,
-                            PermissionTypeName = p.PermissionType.PermissionTypeName,
-                            IsActive = p.IsActive
-                        }).ToList()
-                    };
-
-                    response.Modules.Add(moduleAssignment);
-                }
-            }
-
-            return response;
-
-        }
-
-        public Task<PermissionType?> UpdateAsync(int id, PermissionType permissionType)
-        {
-            throw new NotImplementedException();
-        }
+        }         
     }
 }

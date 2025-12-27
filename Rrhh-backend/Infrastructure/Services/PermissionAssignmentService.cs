@@ -15,12 +15,14 @@ namespace Rrhh_backend.Infrastructure.Services
         private readonly NebulaDbContext _context;
         private readonly IRolesRepository _roleRepository;
         private readonly IModuleRepository _moduleRepository;
+        private readonly IFunctionRepository _functionRepository;
         private readonly IPermissionTypeRepository _permissionTypeRepository;
         private readonly IPermissionAssignmentRepository _permissionAssignmentRepository;
 
         public PermissionAssignmentService(NebulaDbContext context,
                                            IRolesRepository roleRepository,
                                            IModuleRepository moduleRepository,
+                                           IFunctionRepository functionRepository,
                                            IPermissionTypeRepository permissionTypeRepository,
                                            IPermissionAssignmentRepository permissionAssignmentRepository
             )
@@ -28,6 +30,7 @@ namespace Rrhh_backend.Infrastructure.Services
             _context = context;
             _roleRepository = roleRepository;
             _moduleRepository = moduleRepository;
+            _functionRepository = functionRepository;
             _permissionTypeRepository = permissionTypeRepository;
             _permissionAssignmentRepository = permissionAssignmentRepository;
         }
@@ -44,6 +47,14 @@ namespace Rrhh_backend.Infrastructure.Services
                 var module = await _moduleRepository.GetModulesByIdAsync(permissionDetail.ModuleId);
                 if (module == null)
                     throw new BusinessException($"Módulo con ID {permissionDetail.ModuleId} no encontrado");
+
+                if (permissionDetail.FunctionId.HasValue) // Validar función si existe
+                {
+                    var function = await _functionRepository.GetFunctionByIdAsync(permissionDetail.FunctionId.Value);
+                    if (function == null)
+                        throw new BusinessException($"Función con ID {permissionDetail.FunctionId} no encontrada");
+                }
+
 
                 foreach (var permissionTypeId in permissionDetail.PermissionTypeIds)
                 {
@@ -72,7 +83,7 @@ namespace Rrhh_backend.Infrastructure.Services
             if (role == null)
                 throw new BusinessException("Rol no encontrado");
 
-            return await _permissionTypeRepository.GetByRoleIdAsync(roleId);
+            return await _permissionAssignmentRepository.GetByRoleIdAsync(roleId);
         }
     }
 }

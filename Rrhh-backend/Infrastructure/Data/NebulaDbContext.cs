@@ -17,6 +17,7 @@ namespace Rrhh_backend.Infrastructure.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Module> Modules { get; set; } = null!;
+        public DbSet<Function> Functions { get; set; } = null!;
         public DbSet<PermissionType> PermissionTypes { get; set; } = null!;
         public DbSet<Permission> Permissions { get; set; } = null!;
         

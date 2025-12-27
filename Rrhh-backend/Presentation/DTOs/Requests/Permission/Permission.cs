@@ -8,6 +8,7 @@
     public class PermissionAssignmentDetail
     {
         public int ModuleId { get; set; }
+        public int? FunctionId { get; set; }
         public List<int> PermissionTypeIds { get; set; } = new();
     }
 }

@@ -2,8 +2,10 @@
 using Rrhh_backend.Core.Entities;
 using Rrhh_backend.Core.Entities.ModuleEspecial;
 using Rrhh_backend.Core.Interfaces.Repositories;
+using Rrhh_backend.Presentation.DTOs;
 using Rrhh_backend.Presentation.DTOs.Requests.Permission;
 using Rrhh_backend.Presentation.DTOs.Responses.Permissions;
+using System.Collections.Generic;
 
 namespace Rrhh_backend.Infrastructure.Data.Repositories
 {
@@ -35,6 +37,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                     {
                         RoleId = request.RoleId,
                         ModuleId = permissionDetail.ModuleId,
+                        FunctionId = permissionDetail.FunctionId,
                         PermissionTypeId = permissionTypeId,
                         IsActive = true,
                         AssignedAt = DateTime.UtcNow
@@ -63,6 +66,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 
             var permissions = await _context.Permissions
                 .Include(p => p.Module)
+                .Include(p => p.Function)
                 .Include(p => p.PermissionType)
                 .Where(p => p.RoleId == roleId)
                 .ToListAsync();
@@ -78,6 +82,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             var groupedByModule = permissions
                 .GroupBy(p => p.ModuleId)
                 .ToList();
+
             foreach (var moduleGroup in groupedByModule)
             {
                 var module = await _context.Modules.FirstOrDefaultAsync(m => m.ModuleId == moduleGroup.Key);
@@ -88,14 +93,32 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                         ModuleId = module.ModuleId,
                         ModuleName = module.ModuleName,
                         ModuleKey = module.ModuleKey,
-                        Permissions = moduleGroup.Select(p => new PermissionTypeAssignment
-                        {
-                            PermissionTypeId = p.PermissionTypeId,
-                            PermissionTypeName = p.PermissionType.PermissionTypeName,
-                            IsActive = p.IsActive
-                        }).ToList()
+                        Category = module.Category,
+                        Functions = new List<FunctionPermissionAssignment>(),                        
                     };
+                    var groupedByFuction = moduleGroup
+                        .GroupBy(p => p.FunctionId).ToList();
 
+                    foreach (var functionGroup in groupedByFuction)
+                    {
+                        var function = await _context.Functions.FirstOrDefaultAsync(f => f.FunctionId == functionGroup.Key);
+                        if(function != null)
+                        {
+                            var functionAssignment = new FunctionPermissionAssignment
+                            {
+                                FunctionId = function.FunctionId,
+                                FunctionName = function.FunctionName,
+                                Description = function.Description,
+                                Permissions = functionGroup.Select(p => new PermissionTypeAssignment
+                                {
+                                    PermissionTypeId = p.PermissionTypeId,
+                                    PermissionTypeName = p.PermissionType.PermissionTypeName,
+                                    IsActive = p.IsActive
+                                }).ToList()
+                            };
+                            moduleAssignment.Functions.Add(functionAssignment);
+                        }                        
+                    }
                     response.Modules.Add(moduleAssignment);
                 }
             }
@@ -106,8 +129,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         public async Task RemovePermissionsByRoleAsync(int roleId)
         {
             var permissions = await _context.Permissions
-    .Where(p => p.RoleId == roleId)
-    .ToListAsync();
+                                   .Where(p => p.RoleId == roleId)
+                                  .ToListAsync();
 
             _context.Permissions.RemoveRange(permissions);
             await _context.SaveChangesAsync();
