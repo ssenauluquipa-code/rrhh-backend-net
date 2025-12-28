@@ -63,7 +63,7 @@ namespace Rrhh_backend.Presentation.Controllers
         }
 
         [HttpGet("modules")]
-        public async Task<ActionResult<List<Module>>> GetAllModules()
+        public async Task<ActionResult<List<ModulePermissionAssignment>>> GetAllModules()
         {
             try
             {

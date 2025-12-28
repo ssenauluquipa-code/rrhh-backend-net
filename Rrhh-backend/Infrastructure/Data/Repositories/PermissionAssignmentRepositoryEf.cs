@@ -49,9 +49,32 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Module>> GetAllModulesAsync()
+        public async Task<List<ModulePermissionAssignment>> GetAllModulesAsync()
         {
-            return await _context.Modules.ToListAsync();
+            var modules = await _context.Modules
+                .Include(m => m.Functions)
+                .ToListAsync();
+            var result = new List<ModulePermissionAssignment>();
+
+            foreach(var module in modules)
+            {
+                var moduleDto = new ModulePermissionAssignment
+                {
+                    ModuleId = module.ModuleId,
+                    ModuleName = module.ModuleName,
+                    ModuleKey = module.ModuleKey,
+                    Category = module.Category,
+                    Functions = module.Functions.Select(f => new FunctionPermissionAssignment
+                    {
+                        FunctionId = f.FunctionId,
+                        FunctionName = f.FunctionName,
+                        Description = f.Description,
+                        Permissions = new List<PermissionTypeAssignment>() // ✅ Vacío porque no se cargan permisos aquí
+                    }).ToList()
+                };
+                result.Add(moduleDto);
+            }
+            return result;
         }
 
         public async Task<List<PermissionType>> GetAllPermissionTypesAsync()

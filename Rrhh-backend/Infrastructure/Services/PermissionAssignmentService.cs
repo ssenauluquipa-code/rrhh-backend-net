@@ -67,7 +67,7 @@ namespace Rrhh_backend.Infrastructure.Services
             await _permissionAssignmentRepository.AssignPermissionsAsync(request);
         }
 
-        public async Task<List<Module>> GetAllModulesAsync()
+        public async Task<List<ModulePermissionAssignment>> GetAllModulesAsync()
         {
             return await _permissionAssignmentRepository.GetAllModulesAsync();
         }

@@ -9,7 +9,7 @@ namespace Rrhh_backend.Core.Interfaces.Services
     {
         Task<PermissionAssignmentResponse> GetAssignmentByRoleAsync(int roleId);
         Task AssignPermissionsAsync(PermissionAssignmentRequest request);
-        Task<List<Module>> GetAllModulesAsync();
+        Task<List<ModulePermissionAssignment>> GetAllModulesAsync();
         Task<List<PermissionType>> GetAllPermissionTypesAsync();
     }
 }
