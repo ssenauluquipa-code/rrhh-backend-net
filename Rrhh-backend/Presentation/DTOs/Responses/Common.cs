@@ -2,7 +2,7 @@
 {
     public class PermissionResponse
     {
-        public Dictionary<int, List<FunctionPermission>> Permissions { get; set; } = new();
+        public Dictionary<string, List<FunctionPermission>> Permissions { get; set; } = new();
         // Ejemplo: { "users": ["CREATE", "READ"], "clients": ["READ"] }
     }
     public class FunctionPermission
