@@ -17,6 +17,7 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
         {
             var permissions = await _context.Permissions
                 .Include(p => p.Module)
+                .Include(p => p.Function)
                 .Include(p => p.PermissionType)
                 .Where(p => p.RoleId == roleId && p.IsActive)
                 .ToListAsync();

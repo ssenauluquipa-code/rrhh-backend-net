@@ -26,25 +26,44 @@ namespace Rrhh_backend.Infrastructure.Services
             {
                 var permissions = await _permissionRepository.GetActiveByRoleIdAsync(roleId);
                 if (permissions == null || !permissions.Any())
-                    return new PermissionResponse { Permissions = new Dictionary<string, List<string>>() };
+                    return new PermissionResponse { Permissions = new Dictionary<int, List<FunctionPermission>>() };
 
-                var permissionsDict = new Dictionary<string, List<string>>();
+                var permissionsDict = new Dictionary<int, List<FunctionPermission>>();
+
 
                 foreach (var perm in permissions)
                 {
-                    if (perm.Module?.ModuleKey == null || perm.PermissionType?.Code == null)
+                    if (perm.Module?.ModuleKey == null ||
+                        perm.Function?.FunctionName == null ||
+                        perm.PermissionType?.Code == null)
                         continue;
 
-                    var moduleKey = perm.Module.ModuleKey.Trim();
+                    var moduleId = perm.Module.ModuleId;
+                    var functionId = perm.Function.FunctionId;
                     var permCode = perm.PermissionType.Code.Trim();
 
-                    if (string.IsNullOrEmpty(moduleKey) || string.IsNullOrEmpty(permCode))
+                    if (string.IsNullOrEmpty(permCode))
                         continue;
 
-                    if (!permissionsDict.ContainsKey(moduleKey))
-                        permissionsDict[moduleKey] = new List<string>();
+                    if (!permissionsDict.ContainsKey(moduleId))
+                        permissionsDict[moduleId] = new List<FunctionPermission>();
 
-                    permissionsDict[moduleKey].Add(permCode);
+                    var functionPerm = permissionsDict[moduleId]
+                        .FirstOrDefault(f => f.FunctionId == functionId);
+
+                    if (functionPerm == null)
+                    {
+                        // Crear nueva función
+                        functionPerm = new FunctionPermission
+                        {
+                            FunctionId = functionId,
+                            FunctionName = perm.Function.FunctionName,
+                            Permissions = new List<string>()
+                        };
+                        permissionsDict[moduleId].Add(functionPerm);
+                    }
+
+                    functionPerm.Permissions.Add(permCode);
                 }
 
                 return new PermissionResponse { Permissions = permissionsDict };
