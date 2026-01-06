@@ -87,10 +87,13 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
             if (role == null) return null;
 
-            var permissions = await _context.Permissions
-                .Include(p => p.Module)
-                .Include(p => p.Function)
-                .Include(p => p.PermissionType)
+            var allModules = await _context.Modules
+                .Include(m => m.Functions)
+                .ToListAsync();
+
+            var allPermissionTypes = await _context.PermissionTypes.ToListAsync();
+
+            var assignmentPermission = await _context.Permissions
                 .Where(p => p.RoleId == roleId)
                 .ToListAsync();
 
@@ -101,16 +104,8 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                 Modules = new List<ModulePermissionAssignment>()
             };
 
-            // Agrupar permisos por módulo
-            var groupedByModule = permissions
-                .GroupBy(p => p.ModuleId)
-                .ToList();
-
-            foreach (var moduleGroup in groupedByModule)
-            {
-                var module = await _context.Modules.FirstOrDefaultAsync(m => m.ModuleId == moduleGroup.Key);
-                if (module != null)
-                {
+            foreach (var module in allModules)
+            {     
                     var moduleAssignment = new ModulePermissionAssignment
                     {
                         ModuleId = module.ModuleId,
@@ -118,32 +113,27 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                         ModuleKey = module.ModuleKey,
                         Category = module.Category,
                         Functions = new List<FunctionPermissionAssignment>(),                        
-                    };
-                    var groupedByFuction = moduleGroup
-                        .GroupBy(p => p.FunctionId).ToList();
-
-                    foreach (var functionGroup in groupedByFuction)
-                    {
-                        var function = await _context.Functions.FirstOrDefaultAsync(f => f.FunctionId == functionGroup.Key);
-                        if(function != null)
-                        {
+                    };                
+                    foreach (var function in module.Functions)
+                    {                        
                             var functionAssignment = new FunctionPermissionAssignment
                             {
                                 FunctionId = function.FunctionId,
                                 FunctionName = function.FunctionName,
                                 Description = function.Description,
-                                Permissions = functionGroup.Select(p => new PermissionTypeAssignment
+                                Permissions = allPermissionTypes.Select(p => new PermissionTypeAssignment
                                 {
                                     PermissionTypeId = p.PermissionTypeId,
-                                    PermissionTypeName = p.PermissionType.PermissionTypeName,
-                                    IsActive = p.IsActive
+                                    PermissionTypeName = p.PermissionTypeName,
+                                    IsActive = assignmentPermission.Any(ap => 
+                                    ap.FunctionId == function.FunctionId &&
+                                    ap.PermissionTypeId == p.PermissionTypeId
+                                    )
                                 }).ToList()
                             };
-                            moduleAssignment.Functions.Add(functionAssignment);
-                        }                        
+                            moduleAssignment.Functions.Add(functionAssignment);                                            
                     }
-                    response.Modules.Add(moduleAssignment);
-                }
+                    response.Modules.Add(moduleAssignment);                
             }
 
             return response;
