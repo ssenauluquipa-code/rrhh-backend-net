@@ -20,9 +20,9 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             return await _context.PermissionTypes.ToListAsync();
         }
 
-        public Task<PermissionType?> GetByIdAsync(int id)
+        public async Task<PermissionType?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.PermissionTypes.FindAsync(id);
         }         
     }
 }
