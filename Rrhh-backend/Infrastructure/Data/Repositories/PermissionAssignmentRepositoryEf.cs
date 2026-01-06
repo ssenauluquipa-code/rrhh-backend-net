@@ -87,14 +87,22 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
             if (role == null) return null;
 
-            var allModules = await _context.Modules
-                .Include(m => m.Functions)
+            // 1. Cargamos solo los módulos y funciones que tienen permisos asignados para este rol
+            // Usamos Join para asegurarnos de traer solo "la verdad" de la tabla Permissions
+            var assignmentPermission = await _context.Permissions
+                .Include(p => p.PermissionType)
+                .Where(p => p.RoleId == roleId)
                 .ToListAsync();
 
-            var allPermissionTypes = await _context.PermissionTypes.ToListAsync();
+            // Obtenemos los IDs únicos de módulos y funciones que tienen algún permiso
+            var moduleIdsWithPermissions = assignmentPermission.Select(ap => ap.ModuleId).Distinct();
+            var functionIdsWithPermissions = assignmentPermission.Select(ap => ap.FunctionId).Distinct();
 
-            var assignmentPermission = await _context.Permissions
-                .Where(p => p.RoleId == roleId)
+            // 2. Cargamos la estructura completa de módulos y funciones 
+            // pero solo de aquellos que están en la tabla de permisos
+            var modules = await _context.Modules
+                .Include(m => m.Functions)
+                .Where(m => moduleIdsWithPermissions.Contains(m.ModuleId))
                 .ToListAsync();
 
             var response = new PermissionAssignmentResponse
@@ -104,36 +112,46 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
                 Modules = new List<ModulePermissionAssignment>()
             };
 
-            foreach (var module in allModules)
-            {     
-                    var moduleAssignment = new ModulePermissionAssignment
+            foreach (var module in modules)
+            {
+                var moduleAssignment = new ModulePermissionAssignment
+                {
+                    ModuleId = module.ModuleId,
+                    ModuleName = module.ModuleName,
+                    ModuleKey = module.ModuleKey,
+                    Category = module.Category,
+                    Functions = new List<FunctionPermissionAssignment>()
+                };
+
+                // Filtramos solo las funciones de este módulo que tienen permisos
+                var functionsWithPermissions = module.Functions
+                    .Where(f => functionIdsWithPermissions.Contains(f.FunctionId));
+
+                foreach (var function in functionsWithPermissions)
+                {
+                    var functionAssignment = new FunctionPermissionAssignment
                     {
-                        ModuleId = module.ModuleId,
-                        ModuleName = module.ModuleName,
-                        ModuleKey = module.ModuleKey,
-                        Category = module.Category,
-                        Functions = new List<FunctionPermissionAssignment>(),                        
-                    };                
-                    foreach (var function in module.Functions)
-                    {                        
-                            var functionAssignment = new FunctionPermissionAssignment
+                        FunctionId = function.FunctionId,
+                        FunctionName = function.FunctionName,
+                        Description = function.Description,
+                        // CLAVE: Aquí ya NO usamos allPermissionTypes.Select
+                        // Usamos directamente lo que hay en assignmentPermission para esta función
+                        Permissions = assignmentPermission
+                            .Where(ap => ap.FunctionId == function.FunctionId)
+                            .Select(ap => new PermissionTypeAssignment
                             {
-                                FunctionId = function.FunctionId,
-                                FunctionName = function.FunctionName,
-                                Description = function.Description,
-                                Permissions = allPermissionTypes.Select(p => new PermissionTypeAssignment
-                                {
-                                    PermissionTypeId = p.PermissionTypeId,
-                                    PermissionTypeName = p.PermissionTypeName,
-                                    IsActive = assignmentPermission.Any(ap => 
-                                    ap.FunctionId == function.FunctionId &&
-                                    ap.PermissionTypeId == p.PermissionTypeId
-                                    )
-                                }).ToList()
-                            };
-                            moduleAssignment.Functions.Add(functionAssignment);                                            
-                    }
-                    response.Modules.Add(moduleAssignment);                
+                                PermissionTypeId = ap.PermissionTypeId,
+                                PermissionTypeName = ap.PermissionType.PermissionTypeName,
+                                IsActive = ap.IsActive
+                            }).ToList()
+                    };
+                    moduleAssignment.Functions.Add(functionAssignment);
+                }
+
+                if (moduleAssignment.Functions.Any())
+                {
+                    response.Modules.Add(moduleAssignment);
+                }
             }
 
             return response;
