@@ -34,7 +34,7 @@ namespace Rrhh_backend.Infrastructure.Services
                           {
                               FunctionId = fg.Key,
                               FunctionName = fg.First().Function.FunctionName,
-                              Permissions = fg.Select(p => p.PermissionType.Code).ToList()
+                              Permissions = fg.Select(p => p.PermissionTypeId).ToList()
                           })
                           .ToList()
                 );

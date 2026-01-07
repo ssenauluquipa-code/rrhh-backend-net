@@ -9,6 +9,6 @@
     {
         public int FunctionId { get; set; } // ✅ ID numérico
         public string FunctionName { get; set; } = string.Empty;
-        public List<string> Permissions { get; set; } = new();
+        public List<int> Permissions { get; set; } = new();
     }
 }
