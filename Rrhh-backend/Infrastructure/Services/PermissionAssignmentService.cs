@@ -37,33 +37,38 @@ namespace Rrhh_backend.Infrastructure.Services
 
         public async Task AssignPermissionsAsync(PermissionAssignmentRequest request)
         {
+            // Validar existencia del Rol
             var role = await _roleRepository.GetRolesByIdAsync(request.RoleId);
             if (role == null)
                 throw new BusinessException("Rol no encontrado");
 
-            // Validar que los módulos y tipos de permiso existan
+            // Recorrer cada detalle de la asignación (Módulo/Función)
             foreach (var permissionDetail in request.Permissions)
             {
+                // Validar que el Módulo exista
                 var module = await _moduleRepository.GetModulesByIdAsync(permissionDetail.ModuleId);
                 if (module == null)
                     throw new BusinessException($"Módulo con ID {permissionDetail.ModuleId} no encontrado");
 
-                if (permissionDetail.FunctionId.HasValue) // Validar función si existe
+                // Validar la Función si el ID está presente
+                if (permissionDetail.FunctionId.HasValue)
                 {
                     var function = await _functionRepository.GetFunctionByIdAsync(permissionDetail.FunctionId.Value);
                     if (function == null)
                         throw new BusinessException($"Función con ID {permissionDetail.FunctionId} no encontrada");
                 }
 
-
-                foreach (var permissionTypeId in permissionDetail.PermissionTypeIds)
+                // Validar cada Tipo de Permiso dentro de la lista de objetos PermissionTypes
+                foreach (var pTypeRequest in permissionDetail.PermissionTypes)
                 {
-                    var permissionType = await _permissionTypeRepository.GetByIdAsync(permissionTypeId);
+                    // Accedemos a la propiedad .PermissionTypeId del objeto del DTO
+                    var permissionType = await _permissionTypeRepository.GetByIdAsync(pTypeRequest.PermissionTypeId);
                     if (permissionType == null)
-                        throw new BusinessException($"Tipo de permiso con ID {permissionTypeId} no encontrado");
+                        throw new BusinessException($"Tipo de permiso con ID {pTypeRequest.PermissionTypeId} no encontrado");
                 }
             }
 
+            // Si todo es válido, procedemos a la persistencia en el repositorio
             await _permissionAssignmentRepository.AssignPermissionsAsync(request);
         }
 

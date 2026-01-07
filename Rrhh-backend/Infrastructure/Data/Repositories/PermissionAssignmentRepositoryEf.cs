@@ -20,32 +20,39 @@ namespace Rrhh_backend.Infrastructure.Data.Repositories
 
         public async Task AssignPermissionsAsync(PermissionAssignmentRequest request)
         {
-            // Eliminar permisos existentes para el rol
-            var existingPermissions = await _context.Permissions
-                .Where(p => p.RoleId == request.RoleId)
-                .ToListAsync();
-
-            _context.Permissions.RemoveRange(existingPermissions);
-
-            // Crear nuevos permisos
-            var newPermissions = new List<Permission>();
-            foreach (var permissionDetail in request.Permissions)
+            foreach (var detail in request.Permissions)
             {
-                foreach (var permissionTypeId in permissionDetail.PermissionTypeIds)
+                // 'detail.Permissions' ahora debe ser una lista de objetos { PermissionTypeId, IsActive }
+                foreach (var pType in detail.PermissionTypes)
                 {
-                    newPermissions.Add(new Permission
+                    // 1. Buscar si el permiso ya existe
+                    var existingPermission = await _context.Permissions
+                        .FirstOrDefaultAsync(p => p.RoleId == request.RoleId &&
+                                                 p.ModuleId == detail.ModuleId &&
+                                                 p.FunctionId == detail.FunctionId &&
+                                                 p.PermissionTypeId == pType.PermissionTypeId);
+
+                    if (existingPermission != null)
                     {
-                        RoleId = request.RoleId,
-                        ModuleId = permissionDetail.ModuleId,
-                        FunctionId = permissionDetail.FunctionId,
-                        PermissionTypeId = permissionTypeId,
-                        IsActive = true,
-                        AssignedAt = DateTime.UtcNow
-                    });
+                        // 2. Si existe, solo actualizamos su estado
+                        existingPermission.IsActive = pType.IsActive;
+                        existingPermission.AssignedAt = DateTime.UtcNow; // Actualizamos fecha
+                    }
+                    else
+                    {
+                        // 3. Si no existe, lo creamos
+                        _context.Permissions.Add(new Permission
+                        {
+                            RoleId = request.RoleId,
+                            ModuleId = detail.ModuleId,
+                            FunctionId = detail.FunctionId,
+                            PermissionTypeId = pType.PermissionTypeId,
+                            IsActive = pType.IsActive,
+                            AssignedAt = DateTime.UtcNow
+                        });
+                    }
                 }
             }
-
-            await _context.Permissions.AddRangeAsync(newPermissions);
             await _context.SaveChangesAsync();
         }
 
