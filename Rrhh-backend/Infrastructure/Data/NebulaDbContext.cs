@@ -20,6 +20,8 @@ namespace Rrhh_backend.Infrastructure.Data
         public DbSet<Function> Functions { get; set; } = null!;
         public DbSet<PermissionType> PermissionTypes { get; set; } = null!;
         public DbSet<Permission> Permissions { get; set; } = null!;
+
+        public DbSet<Countries> Countries { get; set; } = null!;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,7 +73,15 @@ namespace Rrhh_backend.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
             });
-
+            ////////COUNTRIES
+            modelBuilder.Entity<Countries>(entity =>
+            {
+                entity.HasKey(e => e.CountryId);
+                entity.Property(e => e.CountryName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.IsoCode).IsRequired().HasMaxLength(3);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+            });
+            ///
             base.OnModelCreating(modelBuilder);
         }
     }

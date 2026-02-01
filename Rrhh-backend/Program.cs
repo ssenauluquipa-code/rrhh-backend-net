@@ -170,6 +170,11 @@ builder.Services.AddScoped<IModuleRepository, ModuleRepositoryEf>();
 /***permision type**/
 builder.Services.AddScoped<IPermissionTypeRepository, PermissionTypeRepositoryEf>();
 
+///Countries
+builder.Services.AddScoped<ICountryRepository, CountryRepositoryEf>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+//
+
 
 //JWT AUTHENTICATION
 //var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName);
