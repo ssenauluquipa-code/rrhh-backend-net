@@ -20,8 +20,8 @@ namespace Rrhh_backend.Infrastructure.Data
         public DbSet<Function> Functions { get; set; } = null!;
         public DbSet<PermissionType> PermissionTypes { get; set; } = null!;
         public DbSet<Permission> Permissions { get; set; } = null!;
-
         public DbSet<Countries> Countries { get; set; } = null!;
+        public DbSet<Companies> Companies { get; set; } = null!;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,7 +81,21 @@ namespace Rrhh_backend.Infrastructure.Data
                 entity.Property(e => e.IsoCode).IsRequired().HasMaxLength(3);
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
-            ///
+            ///company
+            modelBuilder.Entity<Companies>(entity =>
+            {
+                entity.HasKey(e => e.CompanyId);
+                entity.Property(e => e.CompanyName).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.TaxId).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Address).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+                entity.HasOne(c => c.Country)
+                .WithMany()
+                .HasForeignKey(c => c.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+            /////
             base.OnModelCreating(modelBuilder);
         }
     }

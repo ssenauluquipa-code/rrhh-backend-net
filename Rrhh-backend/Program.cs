@@ -8,7 +8,6 @@ using Rrhh_backend.Core.Interfaces.Services;
 using Rrhh_backend.Infrastructure.Data;
 using Rrhh_backend.Infrastructure.Data.Repositories;
 using Rrhh_backend.Infrastructure.Services;
-using Rrhh_backend.Security;
 using Rrhh_backend.Shared.Security;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -173,7 +172,9 @@ builder.Services.AddScoped<IPermissionTypeRepository, PermissionTypeRepositoryEf
 ///Countries
 builder.Services.AddScoped<ICountryRepository, CountryRepositoryEf>();
 builder.Services.AddScoped<ICountryService, CountryService>();
-//
+//Company
+builder.Services.AddScoped<ICompanyRepository, CompanyRepositoryEf>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 
 //JWT AUTHENTICATION
