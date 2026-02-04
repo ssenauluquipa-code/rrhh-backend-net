@@ -22,7 +22,8 @@ namespace Rrhh_backend.Infrastructure.Data
         public DbSet<Permission> Permissions { get; set; } = null!;
         public DbSet<Countries> Countries { get; set; } = null!;
         public DbSet<Companies> Companies { get; set; } = null!;
-        
+        public DbSet<Department> Departments { get; set; } = null!;
+        public DbSet<Position> Positions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>(entity =>
@@ -95,7 +96,18 @@ namespace Rrhh_backend.Infrastructure.Data
                 .HasForeignKey(c => c.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
-            /////
+            /////departament
+            modelBuilder.Entity<Department>(entity =>
+            {
+                entity.HasKey(e => e.DepartmentId);
+                entity.Property(e => e.DepartmentName).IsRequired().HasMaxLength(150);
+            });
+            ///Positions
+            modelBuilder.Entity<Position>(entity =>
+            {
+                entity.HasKey(e => e.PositionId);
+            });
+            ///
             base.OnModelCreating(modelBuilder);
         }
     }

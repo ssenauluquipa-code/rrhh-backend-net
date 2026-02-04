@@ -175,8 +175,12 @@ builder.Services.AddScoped<ICountryService, CountryService>();
 //Company
 builder.Services.AddScoped<ICompanyRepository, CompanyRepositoryEf>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
-
-
+//departament
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepositoryEf>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+//position
+builder.Services.AddScoped<IPositionRepository, PositionRepositoryEf>();
+builder.Services.AddScoped<IPositionService, PositionService>();
 //JWT AUTHENTICATION
 //var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName);
 //var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
